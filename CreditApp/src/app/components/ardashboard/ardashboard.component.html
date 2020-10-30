@@ -1,0 +1,818 @@
+<div class="row" soho-busyindicator [activated]="isBusyMyComponent" [blockUI]="true" [displayDelay]="0">
+
+   <kendo-splitter orientation="vertical" style="height: 800px">
+      <kendo-splitter-pane style="height: 400px;">
+
+         <kendo-splitter orientation="horizontal" style="height: 100%;">
+            <kendo-splitter-pane size="50%">
+               <kendo-tabstrip (tabSelect)="onTabSelect($event)">
+                  <kendo-tabstrip-tab [title]="'Credit Stop'" [selected]="true">
+                     <ng-template kendoTabContent>
+                        <kendo-grid [data]="gridData" [selectable]="{mode: 'single'}" [height]="300" [filterable]="true"
+                           [filter]="state.filter" (dataStateChange)="dataStateChange($event)"
+                           [sortable]="{ allowUnsort: false, mode: 'single'}" [sort]="state.sort"
+                           [kendoGridSelectBy]="selectedOrdersKey" [selectedKeys]="selectedOrders"
+                           (selectedKeysChange)="onSelectedOrderChange($event)">
+
+                           <kendo-grid-column field="OAPYNO" title="Payer" width="80" filter="text">
+                           </kendo-grid-column>
+                           <kendo-grid-column field="OAORNO" title="Order No" width="80" filter="text">
+
+                           </kendo-grid-column>
+                           <kendo-grid-column field="OAOBLC" title="CO Stop" width="50" filter="text"
+                              [filterable]="false">
+
+                           </kendo-grid-column>
+                           <kendo-grid-column field="OAOPRI" title="Priority" width="50" filter="text"
+                              [filterable]="false">
+
+                           </kendo-grid-column>
+                           <kendo-grid-column field="F1A030" title="Credit Check" width="50" filter="text"
+                              [filterable]="false">
+
+                           </kendo-grid-column>
+
+                        </kendo-grid>
+
+                     </ng-template>
+                  </kendo-tabstrip-tab>
+                  <kendo-tabstrip-tab [title]="'Customer'">
+                     <ng-template kendoTabContent>
+                        <kendo-grid [data]="gridCustomerData" [selectable]="{mode: 'single'}" [height]="300"
+                           [filterable]="true" [filter]="stateCustomer.filter"
+                           (dataStateChange)="dataStateChangeCustomer($event)"
+                           [sortable]="{ allowUnsort: false, mode: 'single'}" [sort]="stateCustomer.sort"
+                           [kendoGridSelectBy]="selectedCustomerKey" [selectedKeys]="selectedCustomers"
+                           (selectedKeysChange)="onSelectedCustomerChange($event)">
+
+                           <kendo-grid-column field="CUNO" title="Customer no" width="80" filter="text">
+                           </kendo-grid-column>
+                           <kendo-grid-column field="CUNM" title="Customer name" width="80" filter="text"
+                              [filterable]="false">
+
+                           </kendo-grid-column>
+                           <kendo-grid-column field="PYNO" title="Payer" width="70" filter="text" [filterable]="false">
+
+                           </kendo-grid-column>
+                           <kendo-grid-column field="STAT" title="Status" width="50" filter="text" [filterable]="false">
+
+                           </kendo-grid-column>
+                           <kendo-grid-column field="WHLO" title="Facility" width="50" filter="text"
+                              [filterable]="false">
+
+                           </kendo-grid-column>
+
+                        </kendo-grid>
+                     </ng-template>
+                  </kendo-tabstrip-tab>
+
+
+               </kendo-tabstrip>
+            </kendo-splitter-pane>
+
+            <kendo-splitter-pane>
+               <!--<div class="card">
+                  <div class="card-header">
+                     <h2 class="widget-title">Customer Info</h2>
+
+                      <button class="btn-secondary" type="button" id="secondary-action-one" [disabled]="isEnabledButtons"
+                        style="float: right;  margin-left: 8px;  ">Released</button>
+
+
+
+                  </div>
+                  <div class="card-content" style="overflow-y: auto; ">
+
+
+
+
+
+                  </div>
+               </div>-->
+               <kendo-tabstrip>
+                  <kendo-tabstrip-tab [title]="'Customer Details'" [selected]="true">
+                     <ng-template kendoTabContent>
+
+                        <div style="overflow-y: visible; padding-top: 8px; ">
+                           <!--class="row"-->
+                           <div class="one-half column" style="    margin-left: 5px">
+                              <div class="row">
+                                 <div class="one-half column">
+                                    <div class="field">
+                                       <label for="first-name" class="inputfield">Name</label>
+                                       <input type="text" [(ngModel)]="CUSName" id="first-name" name="first-name"
+                                          [readonly]="true" />
+
+                                    </div>
+                                    <div class="field">
+                                       <label for="first-name" class="inputfield">Address</label>
+                                       <textarea id="description-max" class="textarea"
+                                          style="width: 100%; height: 37px; min-height: 50px;" [readonly]="true"
+                                          name="description-max" [(ngModel)]="CustomerFullAddress">
+                                       </textarea>
+
+                                    </div>
+
+                                    <div class="field">
+                                       <label for="first-name" class="inputfield">Acc Contact & Phone</label>
+                                       <input type="text" [(ngModel)]="CUSAccountContact" name="first-name"
+                                          [readonly]="true" />
+                                    </div>
+                                    <div class="field" style="width: 100px; ">
+                                       <label for="first-name" class="inputfield">Sales Person</label>
+                                       <input type="text" [(ngModel)]="CUSSales" name="first-name" [readonly]="true" />
+
+                                    </div>
+                                    <div class="field">
+                                       <label for="first-name" class="inputfield">Customer
+                                          Stop</label>
+                                       <input type="text" [(ngModel)]="CUSCreditLimit" name="first-name"
+                                          [readonly]="true"
+                                          style="width: 60px; margin-right: 4px; margin-bottom: 5px;" />
+                                       <input type="text" [(ngModel)]="CUSPersonalGuar" name="first-name"
+                                          [readonly]="true" style="width: 30px; margin-right: 4px;" />
+                                       <input type="text" [(ngModel)]="CUSPersonalGuarText" name="first-name"
+                                          [readonly]="true" style="width: auto; margin-right: 4px;" />
+
+                                    </div>
+                                    <div class="container">
+                                       <div class="field" style="width: 100px;">
+                                          <label for="first-name" class="inputfield">Credit Limit 2</label>
+                                          <input type="text" [(ngModel)]="CUSCRDLimit2" name="first-name"
+                                             [readonly]="true" />
+
+                                       </div>
+                                       <div class="field" style="width: 100px; margin-left: 10px;">
+                                          <label for="first-name" class="inputfield">Credit Limit 3</label>
+                                          <input type="text" [(ngModel)]="CUSCRDLimit3" name="first-name"
+                                             [readonly]="true" />
+
+                                       </div>
+                                    </div>
+
+                                 </div>
+                                 <div class="one-half column">
+
+                                 </div>
+                              </div>
+
+                           </div>
+
+                           <div class="one-half column">
+
+                              <div class="container">
+                                 <button class="reprintInvoicebtn" style="    float: right;
+                                 right: 8px;
+                                 position: inherit;
+                                 margin-bottom: 8px; " type="button" id="secondary-action-one"
+                                    (click)="AddReveive()">Review</button>
+                              </div>
+
+                              <div class="container">
+                                 <div class="field" style="width: 125px; ">
+                                    <label for="date-field-normal" class="label">From Date:</label>
+                                    <input type="date" [ngModel]="filterDateFrom | date:'yyyy-MM-dd'"
+                                       (ngModelChange)="filterDateFrom = dateChangedFrom($event)" />
+
+                                 </div>
+                                 <div class="field" style="width: 125px; margin-left: 10px;">
+                                    <label for="date-field-normal" class="label">To Field </label>
+
+                                    <input type="date" [ngModel]="filterDateTo | date:'yyyy-MM-dd'"
+                                       (ngModelChange)="filterDateTo = dateChangedTo($event)" />
+                                 </div>
+                                 <div class="field" style="width: 120px; margin-left: 10px;  ">
+                                    <button class="reprintInvoicebtn"
+                                       style="width: 56px; top: 17px; height: 25px; left: 0px;"
+                                       (click)="searchInvoicesFromDate()">search</button>
+
+                                 </div>
+
+                              </div>
+                              <div>
+                                 <label for="first-name" class="inputfield">List of vouchers for {{CUSName}}</label>
+                                 <kendo-grid [data]="gridDataVoucherList" [height]="210"
+                                    [kendoGridSelectBy]="selectedVoucherKey" [selectedKeys]="selectedVoucher"
+                                    (selectedKeysChange)="onSelectedVoucherChange($event)">
+                                    <kendo-grid-column field="ID" title="No." width="30">
+                                    </kendo-grid-column>
+                                    <kendo-grid-column field="ESVONO" title="Voucher No" width="100">
+                                    </kendo-grid-column>
+                                    <kendo-grid-column field="ESCUAM" title="Amount" width="100">
+                                    </kendo-grid-column>
+                                    <kendo-grid-column field="ESRGDT" title="Date (RGDT)" width="100">
+                                    </kendo-grid-column>
+                                 </kendo-grid>
+
+                              </div>
+
+
+                           </div>
+                        </div>
+
+
+
+                     </ng-template>
+                  </kendo-tabstrip-tab>
+                  <kendo-tabstrip-tab [title]="'Customer Notes'">
+                     <ng-template kendoTabContent>
+
+                        <!--  <div style="width: 100%; ">
+                           <kendo-splitter orientation="vertical" style="height: 350px; width: 100%;">
+
+                              <kendo-splitter-pane>
+                                 <label for="date-field-normal" style="margin: 4px;" class="label">Customer
+                                    Note:</label>
+                                 <textarea class="textarea" style="width: 100%; height:170px " name="description-max"
+                                    [readonly]="true" [(ngModel)]="CUSText">
+
+                                                          </textarea>
+
+                              </kendo-splitter-pane>
+
+                              <kendo-splitter-pane size="140px">
+                                 <div class="pane-content">
+                                    <label for="date-field-normal" style="margin: 4px;" class="label">Add a new
+                                       note:</label>
+                                    <textarea class="textarea" style="width: 60%; height:100px " name="description-max"
+                                       [(ngModel)]="CUSTextNew" cols="55">
+
+                                                          </textarea>
+
+
+                                    <button class="reprintInvoicebtn" type="button" id="primary-action-two"
+                                       (click)="SaveCustomerText()" style="float: right; right: 0px; bottom: 1px; ">Save
+                                       New Note</button>
+                                 </div>
+                              </kendo-splitter-pane>
+
+
+                           </kendo-splitter>
+                        </div>-->
+
+                        <div style="overflow-y: visible; padding-top: 8px; padding-right: 4px; ">
+
+                           <label for="date-field-normal" style="margin: 4px;" class="label">Customer
+                              Note:</label>
+                           <textarea class="textarea" style="width: 100%; height:170px " name="description-max"
+                              [readonly]="true" [(ngModel)]="CUSText">
+
+                                                          </textarea>
+
+                           <label for="date-field-normal" style="margin: 4px;" class="label">Add a new
+                              note:</label>
+                           <div>
+                              <textarea class="textarea" style="width: 60%; height:100px " name="description-max"
+                                 [(ngModel)]="CUSTextNew" cols="55">
+
+                                                                            </textarea>
+
+
+                              <button class="reprintInvoicebtn" type="button" id="primary-action-two"
+                                 (click)="SaveCustomerText()" style="float: right; position: inherit;">Save
+                                 New Note</button>
+                           </div>
+
+
+
+
+                        </div>
+
+                     </ng-template>
+                  </kendo-tabstrip-tab>
+
+
+               </kendo-tabstrip>
+            </kendo-splitter-pane>
+         </kendo-splitter>
+
+
+      </kendo-splitter-pane>
+      <kendo-splitter-pane>
+         <button class="reprintInvoicebtn" style="z-index: 999;" (click)="reprintInvoice()">Reprint
+            Invoice</button>
+         <kendo-tabstrip #tabstripInvoice (tabSelect)="onTabSelectAginSection($event)">
+            <kendo-tabstrip-tab [title]="'Aging'" [selected]="setOpenTabTo">
+               <ng-template kendoTabContent>
+                  <div style="height: auto;">
+
+
+
+                     <div class="row cus-subTitle" style="margin-top: 6px;padding-left: 20px;">
+                        <label for="Age distrib" class="cus-subTitle">Credit Status</label>
+
+                     </div>
+                     <div class="container">
+                        <div style="width: 200px; height: 100px; margin-left: 20px;">
+                           <div class="field">
+                              <label for="first-name" class="inputfield">Payer:</label>
+                              <input type="text" [(ngModel)]="selectedCustomerID" [readonly]="true" />
+                           </div>
+                           <div class="field">
+                              <div class="row container" style="margin-bottom: 0px;">
+                                 <div style="margin-left: 0px; width: 50px;">
+                                    <label for="first-name" class="inputfield">Pymt:</label>
+                                    <input type="text" [(ngModel)]="y" [readonly]="true" style="width: 30px;" />
+                                 </div>
+                                 <div style="margin-left: 10px; width: 50px;">
+                                    <label for="first-name" class="inputfield">Age:</label>
+                                    <input type="text" [(ngModel)]="m" [readonly]="true" style="width: 30px;" />
+                                 </div>
+                                 <div style="margin-left: 10px; width: 60px;">
+                                    <button class="reprintInvoicebtn" type="button" style="height: 24px; width:90px ;
+                                    margin-top: 14px;" (click)="LoadForcastData()">Load</button>
+
+                                 </div>
+                              </div>
+
+
+                           </div>
+                        </div>
+                        <div style="width: 100%; height: 100px; margin-left: 20px;">
+
+                           <div class="row container" style="margin-left: 10%;">
+                              <div class="field ageBucket-Item" style="width: 110px;">
+                                 <label for="row-1-1" style="font-weight: bold;">Payment Forcast:</label>
+
+                              </div>
+                              <div class="field ageBucket-Item">
+                                 <label for="row-1-1">{{PFMonth1}}</label>
+                                 <input type="text" id="row-1-1" [(ngModel)]="CR01" [readonly]="true"
+                                    class="ageBucket-Input" />
+                              </div>
+                              <div class="field ageBucket-Item">
+                                 <label for="row-1-1">{{PFMonth2}}</label>
+                                 <input type="text" id="row-1-1" [(ngModel)]="CR02" [readonly]="true"
+                                    class="ageBucket-Input" />
+                              </div>
+                              <div class="field ageBucket-Item">
+                                 <label for="row-1-1">{{PFMonth3}}</label>
+                                 <input type="text" id="row-1-1" [(ngModel)]="CR03" [readonly]="true"
+                                    class="ageBucket-Input" />
+                              </div>
+                           </div>
+
+                           <div class="row container" style="margin-left: 10%;">
+                              <div class="field ageBucket-Item" style="width: 110px;">
+                                 <label for="row-1-1" style="font-weight: bold;">Age Forcast:</label>
+
+                              </div>
+                              <div class="field ageBucket-Item">
+                                 <label for="row-1-1">{{AGMonth1}}</label>
+                                 <input type="text" id="row-1-1" [(ngModel)]="CRA1" [readonly]="true"
+                                    class="ageBucket-Input" />
+                              </div>
+                              <div class="field ageBucket-Item">
+                                 <label for="row-1-1">{{AGMonth2}}</label>
+                                 <input type="text" id="row-1-1" [(ngModel)]="CRA2" [readonly]="true"
+                                    class="ageBucket-Input" />
+                              </div>
+                              <div class="field ageBucket-Item">
+                                 <label for="row-1-1">{{AGMonth3}}</label>
+                                 <input type="text" id="row-1-1" [(ngModel)]="CRA3" [readonly]="true"
+                                    class="ageBucket-Input" />
+                              </div>
+                           </div>
+
+                        </div>
+                     </div>
+
+                     <hr class="fieldset-hr" />
+                     <div class="row" style="height: 60%; width: 100%; margin-top: 5px;">
+                        <div class="one-half column" style="border-right: 1px solid #bdbdbd">
+                           <div class="row cus-subTitle">
+                              <label for="Age distrib" class="cus-subTitle">Credit Status</label>
+                           </div>
+                           <div class="row">
+                              <div class="columns cuz-two-coloum">
+                                 <div class="field cus-r-pad">
+                                    <label for="first-name" class="inputfield">Overdue:</label>
+                                    <input type="text" [(ngModel)]="TDUE" name="first-name" [readonly]="true" />
+
+                                 </div>
+                                 <div class="field cus-r-pad">
+                                    <label for="first-name" class="inputfield">Outstanding:</label>
+                                    <input type="text" [(ngModel)]="TOSB" name="first-name" [readonly]="true" />
+
+                                 </div>
+                                 <div class="field cus-r-pad">
+                                    <label for="first-name" class="inputfield">Avg credit time:</label>
+                                    <input type="text" [(ngModel)]="ACRT" name="first-name" [readonly]="true" />
+
+                                 </div>
+                              </div>
+                              <div class="columns cuz-two-coloum">
+                                 <div class="field cus-r-pad">
+                                    <label for="first-name" class="inputfield">Credit Limit 1</label>
+                                    <input type="text" [(ngModel)]="CRL1" name="first-name" [readonly]="true" />
+
+                                 </div>
+                                 <div class="field cus-r-pad">
+                                    <label for="first-name" class="inputfield">Credit Limit 2</label>
+                                    <input type="text" [(ngModel)]="CRL2" name="first-name" [readonly]="true" />
+
+                                 </div>
+                              </div>
+
+                           </div>
+                        </div>
+                        <div class="one-half column">
+                           <div class="row">
+                              <label for="Age distrib" class="cus-subTitle">Customer/Payer - Invoices and
+                                 Receipts</label>
+                           </div>
+                           <div class="row">
+                              <div class="one-fifth column">
+                                 <label for="first-name" class="inputfield">&nbsp;</label>
+                              </div>
+                              <div class="one-fifth column">
+
+                                 <label for="first-name" class="inputfield cus-subTitle1">cumulative YTD</label>
+
+                              </div>
+                              <div class="one-fifth column">
+                                 <label for="first-name" class="inputfield cus-subTitle1">cumulative YTD</label>
+                              </div>
+                              <div class="one-fifth column" style="width: 6%;">
+                                 <label for="first-name" class="inputfield">&nbsp;</label>
+                              </div>
+
+                              <div class="one-fifth column">
+                                 <label for="first-name" class="inputfield cus-subTitle1">Previous date for</label>
+                              </div>
+
+                           </div>
+                           <div class="row" style="margin-top: 5px;">
+                              <div class="one-fifth column">
+                                 <label for="first-name" class="inputfield">Turnover:</label>
+                              </div>
+                              <div class="one-fifth column">
+                                 <input type="text" [(ngModel)]="TTUR" name="first-name" [readonly]="true"
+                                    [readonly]="true" />
+                              </div>
+                              <div class="one-fifth column">
+                                 <input type="text" [(ngModel)]="PTUR" name="first-name" [readonly]="true" />
+                              </div>
+                              <div class="one-fifth column" style="width: 6%;">
+                                 <label for="first-name" class="inputfield">&nbsp;</label>
+                              </div>
+                              <div class="one-fifth column">
+                                 <div class="field cus-r-pad">
+                                    <label for="first-name" class="inputfield">Invoicing:</label>
+                                    <input type="text" [(ngModel)]="LIDT" name="first-name" [readonly]="true" />
+
+                                 </div>
+                              </div>
+
+                           </div>
+                           <div class="row">
+                              <div class="one-fifth column">
+                                 <label for="first-name" class="inputfield">Turnover excl VAT:</label>
+                              </div>
+                              <div class="one-fifth column">
+                                 <input type="text" [(ngModel)]="TTEV" [readonly]="true" />
+                              </div>
+                              <div class="one-fifth column">
+                                 <input type="text" [(ngModel)]="PTEV" [readonly]="true" />
+                              </div>
+                              <div class="one-fifth column" style="width: 6%;">
+                                 <label for="first-name" class="inputfield">&nbsp;</label>
+                              </div>
+                              <div class="one-fifth column">
+                                 <div class="field cus-r-pad">
+                                    <label for="first-name" class="inputfield">Payment recvd:</label>
+                                    <input type="text" [(ngModel)]="LPDT" [readonly]="true" />
+
+                                 </div>
+
+                              </div>
+
+                           </div>
+                           <div class="row">
+                              <div class="one-fifth column">
+                                 <label for="first-name" class="inputfield">No. invoices:</label>
+                              </div>
+                              <div class="one-fifth column">
+                                 <input type="text" [(ngModel)]="TNOI" [readonly]="true" />
+                              </div>
+                              <div class="one-fifth column">
+                                 <input type="text" [(ngModel)]="PNOI" [readonly]="true" />
+                              </div>
+                              <div class="one-fifth column" style="width: 6%;">
+                                 <label for="first-name" class="inputfield">&nbsp;</label>
+                              </div>
+                              <div class="one-fifth column">
+                                 <div class="field cus-r-pad">
+                                    <label for="first-name" class="inputfield">Back Order:</label>
+                                    <input type="text" [(ngModel)]="BackOrderValue" [readonly]="true" />
+
+                                 </div>
+                              </div>
+
+                           </div>
+
+
+
+                        </div>
+                     </div>
+                  </div>
+               </ng-template>
+            </kendo-tabstrip-tab>
+            <kendo-tabstrip-tab [title]="'Open Invoices'" [disabled]="disableTabs">
+               <ng-template kendoTabContent>
+
+                  <!-- <kendo-grid [data]="gridOpenInvoices" [selectable]="{mode: 'single'}" [height]="400"
+                     [filterable]="true" [filter]="state.filter" (dataStateChange)="dataStateChangeOpenInvoices($event)"
+                     [sortable]="{ allowUnsort: false, mode: 'single'}" [sort]="stateOpenInvoices.sort"
+                     [kendoGridSelectBy]="selectedOpenInvoiceKey" [selectedKeys]="selectedPaidInvoices"
+                     (selectedKeysChange)="onSelectedOpenInvoiceChange($event)">
+                     <ng-template kendoGridToolbarTemplate>
+                        <button kendoGridPDFCommand icon="file-pdf">Export to PDF</button>
+                     </ng-template>
+
+                     <kendo-grid-column field="ESPYNO" title="Payer" width="100" filter="text">
+                     </kendo-grid-column>
+                     <kendo-grid-column field="ESCINO" title="Invoice No" width="100" filter="text">
+                     </kendo-grid-column>
+                     <kendo-grid-column field="ESINYR" title="Invoice Year" width="100" filter="text">
+                     </kendo-grid-column>
+                     <kendo-grid-column field="ESCUNO" title="Customer" width="100" filter="text">
+                     </kendo-grid-column>
+                     <kendo-grid-column field="ESTRCD" title="Trans Code" width="100" filter="text">
+                     </kendo-grid-column>
+                     <kendo-grid-column field="ESYEA4" title="Year" width="100" filter="text">
+                     </kendo-grid-column>
+                     <kendo-grid-column field="ESJRNO" title="Journal No" width="100" filter="text">
+                     </kendo-grid-column>
+
+                     <kendo-grid-pdf fileName="Open Invoices.pdf" [allPages]="true" paperSize="A4"
+                        [repeatHeaders]="true" [landscape]="false">
+                        <kendo-grid-pdf-margin top="3cm" left="1cm" right="1cm" bottom="1cm">
+                        </kendo-grid-pdf-margin>
+                        <ng-template kendoGridPDFTemplate let-pageNum="pageNum" let-totalPages="totalPages">
+                           <div class="page-template" style="margin-top: 1px;  ">
+                              <div class="header" style="background-color: white; color: gray;">
+                                 <div style="float: right;margin-right: 40px; font-size: xx-small;">Page {{ pageNum }}
+                                    of {{ totalPages }}
+                                 </div>
+                                 <img src="../../../assets/Forest1.png" width="60" height="50" style="float: left;">
+                                 <h1 style="color: gray; padding: 10px; font-weight: bold;">Open Invoices Report -
+                                    {{selectedCustomerID}}</h1>
+                              </div>
+                              <div class="footer">
+                                 Page {{ pageNum }} of {{ totalPages }}
+                              </div>
+                           </div>
+                        </ng-template>
+                     </kendo-grid-pdf>
+
+
+                  </kendo-grid>-->
+
+                  <kendo-grid [data]="gridViewOpenInvoice" [pageSize]="pageSizeOpenInvoice" [skip]="skipOpenInvoice"
+                     [pageable]="true" (pageChange)="pageChangeOpenInvoice($event)" [selectable]="{mode: 'single'}"
+                     [kendoGridSelectBy]="selectedOpenInvoiceKey" [selectedKeys]="selectedOpenInvoices"
+                     (selectedKeysChange)="onSelectedOpenInvoiceChange($event)">
+                     <kendo-grid-column field="ID" title="No" width="30" filter="text">
+                     </kendo-grid-column>
+                     <kendo-grid-column field="ESCINO" title="Invoice No" width="100" filter="text">
+                     </kendo-grid-column>
+                     <kendo-grid-column field="ESIVDT" title="Invoice Date" width="100" filter="text">
+                     </kendo-grid-column>
+                     <kendo-grid-column field="ESDUDT" title="Due Date" width="100" filter="text">
+                     </kendo-grid-column>
+                     <kendo-grid-column field="ESPYCD" title="Trans Code" width="100" filter="text">
+                     </kendo-grid-column>
+                     <kendo-grid-column field="ESCUCD" title="Currency" width="100" filter="text">
+                     </kendo-grid-column>
+                     <kendo-grid-column field="ESCUAM" title="Amount" width="100" filter="text">
+                     </kendo-grid-column>
+                     <kendo-grid-column field="ESPYRS" title="Rem" width="100" filter="text">
+                     </kendo-grid-column>
+                     <kendo-grid-column field="ESRMST" title="Status" width="100" filter="text">
+                     </kendo-grid-column>
+                     <kendo-grid-column field="ESPYTP" title="Pmt Term" width="100" filter="text">
+                     </kendo-grid-column>
+                  </kendo-grid>
+
+
+
+
+               </ng-template>
+            </kendo-tabstrip-tab>
+            <kendo-tabstrip-tab [title]="'Paid Invoices'" [disabled]="disableTabs">
+
+               <ng-template kendoTabContent>
+                  <!-- <kendo-grid [data]="gridPaidInvoices" [selectable]="{mode: 'single'}" [height]="400"
+                     [filterable]="true" [filter]="state.filter" (dataStateChange)="dataStateChangePaidInvoices($event)"
+                     [sortable]="{ allowUnsort: false, mode: 'single'}" [sort]="selectedPaidInvoices.sort"
+                     [kendoGridSelectBy]="selectedPaidInvoiceKey" [selectedKeys]="selectedOpenInvoices"
+                     (selectedKeysChange)="onSelectedPaidInvoiceChange($event)">
+                     <ng-template kendoGridToolbarTemplate>
+                        <button kendoGridPDFCommand icon="file-pdf">Export to PDF</button>
+                     </ng-template>
+
+                     <kendo-grid-column field="ESPYNO" title="Payer" width="100" filter="text">
+                     </kendo-grid-column>
+                     <kendo-grid-column field="ESCINO" title="Invoice No" width="100" filter="text">
+                     </kendo-grid-column>
+                     <kendo-grid-column field="ESINYR" title="Invoice Year" width="100" filter="text">
+                     </kendo-grid-column>
+                     <kendo-grid-column field="ESCUNO" title="Customer" width="100" filter="text">
+                     </kendo-grid-column>
+                     <kendo-grid-column field="ESTRCD" title="Trans Code" width="100" filter="text">
+                     </kendo-grid-column>
+                     <kendo-grid-column field="ESYEA4" title="Year" width="100" filter="text">
+                     </kendo-grid-column>
+                     <kendo-grid-column field="ESJRNO" title="Journal No" width="100" filter="text">
+                     </kendo-grid-column>
+
+                     <kendo-grid-pdf fileName="Paid Invoices.pdf" [allPages]="true" paperSize="A4"
+                        [repeatHeaders]="true" [landscape]="false">
+                        <kendo-grid-pdf-margin top="3cm" left="1cm" right="1cm" bottom="1cm">
+                        </kendo-grid-pdf-margin>
+                        <ng-template kendoGridPDFTemplate let-pageNum="pageNum" let-totalPages="totalPages">
+                           <div class="page-template" style="margin-top: 1px;  ">
+                              <div class="header" style="background-color: white; color: gray;">
+                                 <div style="float: right;margin-right: 40px; font-size: xx-small;">Page {{ pageNum }}
+                                    of {{ totalPages }}
+                                 </div>
+                                 <img src="../../../assets/Forest1.png" width="60" height="50" style="float: left;">
+                                 <h1 style="color: gray; padding: 10px; font-weight: bold;">Paid Invoices Report -
+                                    {{selectedCustomerID}}</h1>
+                              </div>
+                              <div class="footer">
+                                 Page {{ pageNum }} of {{ totalPages }}
+                              </div>
+                           </div>
+                        </ng-template>
+                     </kendo-grid-pdf>
+
+                  </kendo-grid>-->
+
+                  <kendo-grid [data]="gridViewPaidInvoice" [pageSize]="pageSizePaidInvoice" [skip]="skipPaidInvoice"
+                     [pageable]="true" (pageChange)="pageChangePaidInvoice($event)" [selectable]="{mode: 'single'}"
+                     [kendoGridSelectBy]="selectedPaidInvoiceKey" [selectedKeys]="selectedPaidInvoices"
+                     (selectedKeysChange)="onSelectedPaidInvoiceChange($event)">
+                     <kendo-grid-column field="ID" title="No" width="30" filter="text">
+                     </kendo-grid-column>
+                     <kendo-grid-column field="ESCINO" title="Invoice No" width="100" filter="text">
+                     </kendo-grid-column>
+                     <kendo-grid-column field="ESIVDT" title="Invoice Date" width="100" filter="text">
+                     </kendo-grid-column>
+                     <kendo-grid-column field="ESDUDT" title="Due Date" width="100" filter="text">
+                     </kendo-grid-column>
+                     <kendo-grid-column field="ESPYCD" title="Trans Code" width="100" filter="text">
+                     </kendo-grid-column>
+                     <kendo-grid-column field="ESCUCD" title="Currency" width="100" filter="text">
+                     </kendo-grid-column>
+                     <kendo-grid-column field="ESCUAM" title="Amount" width="100" filter="text">
+                     </kendo-grid-column>
+                     <kendo-grid-column field="ESPYRS" title="Rem" width="100" filter="text">
+                     </kendo-grid-column>
+                     <kendo-grid-column field="ESRMST" title="Status" width="100" filter="text">
+                     </kendo-grid-column>
+                     <kendo-grid-column field="ESPYTP" title="Pmt Term" width="100" filter="text">
+                     </kendo-grid-column>
+                  </kendo-grid>
+
+
+
+               </ng-template>
+            </kendo-tabstrip-tab>
+            <kendo-tabstrip-tab [title]="'All Invoices'" [disabled]="disableTabs">
+               <ng-template kendoTabContent>
+                  <!--<kendo-grid [data]="gridAllInvoices" [selectable]="{mode: 'single'}" [height]="400"
+                     [filterable]="true" [filter]="state.filter" (dataStateChange)="dataStateChangeAllInvoices($event)"
+                     [sortable]="{ allowUnsort: false, mode: 'single'}" [sort]="selectedAllInvoices.sort"
+                     [kendoGridSelectBy]="selectedAllInvoiceKey" [selectedKeys]="selectedCustomers"
+                     (selectedKeysChange)="onSelectedAllInvoiceChange($event)" [pageSize]="pageSize" [skip]="skip"
+                     [pageable]="true" (pageChange)="pageChange($event)">
+
+                     <ng-template kendoGridToolbarTemplate>
+                        <button kendoGridPDFCommand icon="file-pdf">Export to PDF</button>
+                     </ng-template>
+
+                     <kendo-grid-column field="ESPYNO" title="Payer" width="100" filter="text">
+                     </kendo-grid-column>
+                     <kendo-grid-column field="ESCINO" title="Invoice No" width="100" filter="text">
+                     </kendo-grid-column>
+                     <kendo-grid-column field="ESINYR" title="Invoice Year" width="100" filter="text">
+                     </kendo-grid-column>
+                     <kendo-grid-column field="ESCUNO" title="Customer" width="100" filter="text">
+                     </kendo-grid-column>
+                     <kendo-grid-column field="ESTRCD" title="Trans Code" width="100" filter="text">
+                     </kendo-grid-column>
+                     <kendo-grid-column field="ESYEA4" title="Year" width="100" filter="text">
+                     </kendo-grid-column>
+                     <kendo-grid-column field="ESJRNO" title="Journal No" width="100" filter="text">
+                     </kendo-grid-column>
+
+                     <kendo-grid-pdf fileName="All Invoices.pdf" [allPages]="true" paperSize="A4" [repeatHeaders]="true"
+                        [landscape]="false" [scale]="0.8">
+                        <kendo-grid-pdf-margin top="3cm" left="1cm" right="1cm" bottom="1cm">
+                        </kendo-grid-pdf-margin>
+                        <ng-template kendoGridPDFTemplate let-pageNum="pageNum" let-totalPages="totalPages">
+                           <div class="page-template" style="margin-top: 1px;  ">
+                              <div class="header" style="background-color: white; color: gray;">
+                                 <div style="float: right;margin-right: 40px; font-size: xx-small;">Page {{ pageNum }}
+                                    of {{ totalPages }}
+                                 </div>
+                                 <img src="../../../assets/Forest1.png" width="60" height="50" style="float: left;">
+                                 <h1 style="color: gray; padding: 10px; font-weight: bold;">All Invoices Report -
+                                    {{selectedCustomerID}}</h1>
+                              </div>
+                              <div class="footer">
+                                 Page {{ pageNum }} of {{ totalPages }}
+                              </div>
+                           </div>
+                        </ng-template>
+
+                          <kendo-grid-column style="font-size: small;" field="ESCINO" title="Invoice No">
+                        </kendo-grid-column>
+                        <kendo-grid-column style="font-size: small;" field="ESJRNO" title="Journal No">
+                        </kendo-grid-column>
+                        <kendo-grid-column style="font-size: small;" field="ESTRCD" title="TRCD"> </kendo-grid-column>
+                        <kendo-grid-column style="font-size: small;" field="ESCUNO" title="Customer">
+                        </kendo-grid-column>
+                     </kendo-grid-pdf>
+ [kendoGridSelectBy]="selectedOrdersKey" [selectedKeys] [selectedKeys]="selectedAllInvoices"
+                  </kendo-grid>-->
+
+                  <kendo-grid [data]="gridViewAllInvoice" [pageSize]="pageSizeAllInvoice" [skip]="skipAllInvoice"
+                     [pageable]="true" (pageChange)="pageChangeAllInvoice($event)" [selectable]="{mode: 'single'}"
+                     [kendoGridSelectBy]="selectedOrdersKeyInvoice" [selectedKeys]="selectedAllInvoices"
+                     (selectedKeysChange)="onSelectedInvoiceChange($event)">
+
+
+                     <kendo-grid-column field="ID" title="No" width="30" filter="text">
+                     </kendo-grid-column>
+                     <kendo-grid-column field="ESCINO" title="Invoice No" width="100" filter="text">
+                     </kendo-grid-column>
+                     <kendo-grid-column field="ESIVDT" title="Invoice Date" width="100" filter="text">
+                     </kendo-grid-column>
+                     <kendo-grid-column field="ESDUDT" title="Due Date" width="100" filter="text">
+                     </kendo-grid-column>
+                     <kendo-grid-column field="ESPYCD" title="Trans Code" width="100" filter="text">
+                     </kendo-grid-column>
+                     <kendo-grid-column field="ESCUCD" title="Currency" width="100" filter="text">
+                     </kendo-grid-column>
+                     <kendo-grid-column field="ESCUAM" title="Amount" width="100" filter="text">
+                     </kendo-grid-column>
+                     <kendo-grid-column field="ESPYRS" title="Rem" width="100" filter="text">
+                     </kendo-grid-column>
+                     <kendo-grid-column field="ESRMST" title="Status" width="100" filter="text">
+                     </kendo-grid-column>
+                     <kendo-grid-column field="ESPYTP" title="Pmt Term" width="100" filter="text">
+                     </kendo-grid-column>
+
+                  </kendo-grid>
+
+               </ng-template>
+            </kendo-tabstrip-tab>
+            <kendo-tabstrip-tab [title]="'Invoices for last payment'" [disabled]="disableTabs">
+               <ng-template kendoTabContent>
+                  <kendo-grid [data]="gridViewLastPaymentInvoice" [pageSize]="pageSizeLastPaymentInvoice"
+                     [skip]="skipLastPaymentInvoice" [pageable]="true"
+                     (pageChange)="pageChangeLastPaymentInvoice($event)" [selectable]="{mode: 'single'}"
+                     [kendoGridSelectBy]="selectedAllVoucherInvoiceKey" [selectedKeys]="selectedAllInvoices"
+                     (selectedKeysChange)="onSelectedPaidInvoiceVoucherChange($event)">
+                     <kendo-grid-column field="ID" title="No" width="30" filter="text">
+                     </kendo-grid-column>
+                     <kendo-grid-column field="ESCINO" title="Invoice No" width="100" filter="text">
+                     </kendo-grid-column>
+                     <kendo-grid-column field="ESIVDT" title="Invoice Date" width="100" filter="text">
+                     </kendo-grid-column>
+                     <kendo-grid-column field="ESDUDT" title="Due Date" width="100" filter="text">
+                     </kendo-grid-column>
+                     <kendo-grid-column field="ESPYCD" title="Trans Code" width="100" filter="text">
+                     </kendo-grid-column>
+                     <kendo-grid-column field="ESCUCD" title="Currency" width="100" filter="text">
+                     </kendo-grid-column>
+                     <kendo-grid-column field="ESCUAM" title="Amount" width="100" filter="text">
+                     </kendo-grid-column>
+                     <kendo-grid-column field="ESPYRS" title="Rem" width="100" filter="text">
+                     </kendo-grid-column>
+                     <kendo-grid-column field="ESRMST" title="Status" width="100" filter="text">
+                     </kendo-grid-column>
+                     <kendo-grid-column field="ESPYTP" title="Pmt Term" width="100" filter="text">
+                     </kendo-grid-column>
+                  </kendo-grid>
+               </ng-template>
+            </kendo-tabstrip-tab>
+
+
+
+         </kendo-tabstrip>
+      </kendo-splitter-pane>
+   </kendo-splitter>
+
+
+</div>
+
+
+
+
+
+<!--*************
+   ***********************-->

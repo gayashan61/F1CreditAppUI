@@ -1,0 +1,106 @@
+.row {
+   font-size: 12px;
+   font-size: 1.2rem;
+   clear: both;
+   margin: 0 auto;
+    max-width: 100%;
+   width: 100%;
+}
+.field {
+   margin-bottom: 5px;
+   position: relative;
+}
+label, .label {
+   font-size: 12px;
+   font-size: 1.2rem;
+   color: #5c5c5c;
+   display: block;
+    margin-bottom: 1px;
+   min-height: 13px;
+}
+input, textarea {
+   padding: 3px 3px;
+}
+.k-grid th, .k-grid td {
+   padding: 3px 6px;
+}
+.k-tabstrip>.k-content{
+   padding: 0px;
+}
+.k-splitter-flex .k-pane{
+   height: auto;
+}
+.cuz-two-coloum{
+   width: 48%;
+}
+.cus-r-pad{
+   padding-right: 10px;
+}
+.cus-subTitle{
+   height: 20px;
+   font-weight: bold;
+   font-size: inherit;
+   text-decoration: underline;
+}
+
+
+.cus-subTitle1{
+
+   font-weight: bold;
+
+}
+.fieldset-hr{
+  margin-top: 0px;
+}
+::-webkit-scrollbar {
+   width: 0.5em;
+   height: 1px
+}
+::-webkit-scrollbar-button {
+   background: #ccc
+}
+::-webkit-scrollbar-track-piece {
+   background: #888
+}
+::-webkit-scrollbar-thumb {
+   background: #eee
+}
+
+.container {
+   display: flex; /* or inline-flex */
+   flex-direction: row;
+   justify-content: flex-start;
+ }
+ .ageBucket-Item{
+   width: 20%;
+   margin-left: 15px;
+}
+.ageBucket-Input{
+   width: 100%;
+}
+@media screen and (max-width: 800px) {
+   .ageBucket-Item{
+      width: 20%;
+      margin-left: 15px;
+   }
+   .ageBucket-Input{
+      width: 100%;
+   }
+ }
+ .field > input, .field > textarea{
+    font-size: small;
+ }
+
+ .reprintInvoicebtn{
+   position: absolute;
+   right: 0px;
+   height: 30px;
+   width: 150px;
+   background-color: #5c5c5c;
+   color: white;
+   font-weight: bold;
+ }
+
+ .column{
+    margin-left: 10px;
+ }
