@@ -104,3 +104,10 @@ input, textarea {
  .column{
     margin-left: 10px;
  }
+ .divitionDropdown{
+   display: inline-flex;
+   position: absolute;
+   z-index: 999;
+   right: 9px;
+   top: 6px;
+ }

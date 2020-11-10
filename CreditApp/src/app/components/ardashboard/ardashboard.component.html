@@ -8,6 +8,21 @@
                <kendo-tabstrip (tabSelect)="onTabSelect($event)">
                   <kendo-tabstrip-tab [title]="'Credit Stop'" [selected]="true">
                      <ng-template kendoTabContent>
+                        <div class="divitionDropdown">
+                           <label for="faci" style="font-size: larger;    margin-right: 55px;">Select Facility:</label>
+
+                           <select style="margin-left: 20px; font-size: larger; height: 20px; width: 50px;"
+                              class="reprintInvoicebtn" name="faci" id="faci" #myFACI
+                              (change)='onFacilitySelected(myFACI.value)'>
+                              <option value="200">200</option>
+                              <option value="300" selected>300</option>
+                              <option value="400">400</option>
+                              <option value="450">450</option>
+                              <option value="470">470</option>
+                              <option value="500">500</option>
+                              <option value="600">600</option>
+                           </select>
+                        </div>
                         <kendo-grid [data]="gridData" [selectable]="{mode: 'single'}" [height]="300" [filterable]="true"
                            [filter]="state.filter" (dataStateChange)="dataStateChange($event)"
                            [sortable]="{ allowUnsort: false, mode: 'single'}" [sort]="state.sort"
@@ -166,6 +181,11 @@
                                  position: inherit;
                                  margin-bottom: 8px; " type="button" id="secondary-action-one"
                                     (click)="AddReveive()">Review</button>
+                                 <button class="reprintInvoicebtn" style="    float: right;
+                                    right: 8px;
+                                    position: inherit;
+                                    margin-bottom: 8px; " type="button" id="secondary-action-one"
+                                    (click)="ReleaseOrder()">Release</button>
                               </div>
 
                               <div class="container">
@@ -775,7 +795,7 @@
                   <kendo-grid [data]="gridViewLastPaymentInvoice" [pageSize]="pageSizeLastPaymentInvoice"
                      [skip]="skipLastPaymentInvoice" [pageable]="true"
                      (pageChange)="pageChangeLastPaymentInvoice($event)" [selectable]="{mode: 'single'}"
-                     [kendoGridSelectBy]="selectedAllVoucherInvoiceKey" [selectedKeys]="selectedAllInvoices"
+                     [kendoGridSelectBy]="selectedAllVoucherInvoiceKey" [selectedKeys]="selectedPaidInvoices"
                      (selectedKeysChange)="onSelectedPaidInvoiceVoucherChange($event)">
                      <kendo-grid-column field="ID" title="No" width="30" filter="text">
                      </kendo-grid-column>

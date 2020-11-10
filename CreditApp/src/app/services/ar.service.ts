@@ -40,6 +40,16 @@ export class ARService {
 
    }
 
+   public ReleaseOrder(ORNO: string, FACI: string) {
+
+      const dat = { "ORNO": ORNO, "FACI": FACI };
+
+      return this.httpClient.post(`${this.apiURL}/ReleaseOrder/`, dat);
+
+   }
+
+
+
    public GetVoucherList(PYNO: string) {
 
       const dat = { "PYNO": PYNO };

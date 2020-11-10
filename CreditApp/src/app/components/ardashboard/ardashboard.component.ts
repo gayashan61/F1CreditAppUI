@@ -10,9 +10,9 @@ import { Bookmark, IFormResponse } from '@infor-up/m3-odin/dist/form/base';
 import { SohoMessageService } from 'ids-enterprise-ng';
 import { DatePipe, formatDate } from '@angular/common'
 import { TabStripComponent } from '@progress/kendo-angular-layout';
-
-
 import { ApplicationService } from '@infor-up/m3-odin-angular';
+import { Clipboard } from 'ts-clipboard';
+
 
 
 @Component({
@@ -35,7 +35,7 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
    isEnabledButtons: boolean;
    EnableCustomerTextBox: boolean = false;
 
-   FACI;
+   FACI: string = "300";
    isBusyMyComponent = false;
    /**Grid Properties */
    private gridData: GridDataResult; // = process(this.OrderList, this.state);
@@ -114,6 +114,21 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
       this.dt = new Date();
       this.myDateFrom = new Date();
       this.myDateTo = new Date();
+
+   }
+
+   onFacilitySelected(FACI) {
+      this.resetGlobleVar();
+      this.FACI = FACI;
+      this.setBusy(true);
+      delete this.OrderList;
+      this.arService.GetAROrders(this.FACI).subscribe((res) => {
+         this.setBusy(false);
+         this.OrderList = res;
+         this.gridData = process(this.OrderList, this.state);
+         // this.responce.forEach(element => { });
+
+      });
    }
 
    /**Region UI Click Events */
@@ -312,7 +327,8 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
    }
 
    public selectedAllVoucherInvoiceKey(context: RowArgs): string {
-      return context.dataItem.CUNO + '-' + context.index;
+
+      return context.dataItem.ESCINO + '-' + context.index;
    }
 
    //**End of Grid functions */
@@ -599,6 +615,7 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
    }
 
    private loadItemsLastPaymentInvoice(): void {
+
       this.gridViewLastPaymentInvoice = {
          data: this.LastPaymentInvoiceList.slice(this.skipLastPaymentInvoice, this.skipLastPaymentInvoice + this.pageSizeLastPaymentInvoice),
          total: this.LastPaymentInvoiceList.length
@@ -607,7 +624,8 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
    /**END OfLastPayment Invoice List Data Grid */
    VoucherSelected;
    onSelectedVoucherChange(e) {
-
+      delete this.LastPaymentInvoiceList;
+      delete this.gridViewLastPaymentInvoice;
       this.VoucherSelected = e[0];
       console.log(this.VoucherSelected);
 
@@ -635,6 +653,15 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
       delete this.CurrentCustomerLNCD;
       delete this.CurrentCustomerTXID;
       delete this.selectedOrderID;
+
+      delete this.TOSB; delete this.TDUE; delete this.ACRT; delete this.CRL1; delete this.CRL2; delete this.TTUR; delete this.PTUR;
+      delete this.LIDT; delete this.TTEV; delete this.PTEV; delete this.LPDT;
+      delete this.TNOI; delete this.PNOI; delete this.BackOrderValue;
+      delete this.CR01; delete this.CR02; delete this.CR03;
+      delete this.CRA1; delete this.CRA2; delete this.CRA3;
+      delete this.PFMonth1; delete this.PFMonth2; delete this.PFMonth3;
+      delete this.AGMonth1; delete this.AGMonth2; delete this.AGMonth3;
+
    }
 
 
@@ -657,16 +684,28 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
 
    }
    onSelectedPaidInvoiceVoucherChange(e) {
-
-      this.ReprintInvoiceNo = e[0]
+      console.log(e);
+      console.log(e[0]);
+      var splitted = e[0].split("-", 1);
+      console.log(splitted);
+      this.ReprintInvoiceNo = splitted;
+      console.log(this.ReprintInvoiceNo);
    }
 
    link: string = "OIS680";
 
    reprintInvoice() {
 
-      alert(this.link);
-      this.appservice.launch(this.link);
+
+      try {
+         console.log(this.ReprintInvoiceNo);
+         Clipboard.copy(this.ReprintInvoiceNo);
+         this.appservice.launch("OIS680");
+
+      } catch (error) {
+
+      }
+
 
       /*if (this.ReprintInvoiceNo.length > 0) {
 
@@ -708,12 +747,14 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
 
    BackOrderValue;
    GetBackOrder(cuno) {
-      this.setBusy(true);
+
       this.arService.GetBackOrderValue(cuno).subscribe((res) => {
          console.log(res);
          this.BackOrderValue = res;
+         this.setBusy(false);
+
       });
-      this.setBusy(false);
+
    }
 
 
@@ -822,7 +863,7 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
       this.currentLanguage = userContext.currentLanguage;
       this.currentDivision = '300';
       this.setBusy(true);
-      this.arService.GetAROrders(this.currentDivision).subscribe((res) => {
+      this.arService.GetAROrders(this.FACI).subscribe((res) => {
          this.setBusy(false);
          this.OrderList = res;
          this.gridData = process(this.OrderList, this.state);
@@ -1043,6 +1084,19 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
       }
 
    }
+
+   ReleaseOrder() {
+      alert(this.selectedOrderID);
+      if (this.selectedOrderID == "" || this.selectedOrderID == "undefined") {
+
+      } else {
+         this.arService.ReleaseOrder(this.selectedOrderID, "300").subscribe((res) => {
+
+            alert(res);
+         });
+      }
+
+   }
    private DelCredReviewCheck(key) {
 
       this.setBusy(true);
@@ -1172,7 +1226,7 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
    //**Load ForacstData on click */
 
    LoadForcastData() {
-      this.setBusy(false);
+      this.setBusy(true);
       this.selectedCustomerID; // V1
       var _QTTP = "1";
       var _TODT = "";
@@ -1213,10 +1267,10 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
    public CallBackForcastData(_QTTP, _TODT, _CRSL, _CRAG, _PYNO) {
 
       const bookmark = this.getMyBookmark(_QTTP, _TODT, _CRSL, _CRAG, _PYNO);
-      this.setBusy(true);
+      // this.setBusy(true);
 
       this.formService.executeBookmark(bookmark).subscribe((r) => {
-         this.setBusy(false);
+         // this.setBusy(false);
          this.onBookmarkResponse(r);
 
       }, (r) => {
@@ -1270,7 +1324,7 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
 
       }
 
-
+      // this.setBusy(false);
    }
    private onError(): void {
       const message = "Message" || 'Unable to open bookmark';
