@@ -66,6 +66,9 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
    private CurrentCustomerLNCD: string = "";
    private CurrentCustomerTXID: string = "";
 
+   public IsTabCustomerDetailsSelected: Boolean = true;
+   public IsTabCustomerDetailsUpdateSelected: Boolean = false;
+
 
    //**Iframe Properties */
    name = 'Set iframe source';
@@ -90,6 +93,12 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
 
    //Control Tabs
    disableTabs = true;
+
+   //Customer Update Variables
+   UCUS_PHNO; UCUS_PHN2; UCUS_YREF; UCUS_YRE2; UCUS_CUNM; UCUS_CUA1;
+   UCUS_CUA2; UCUS_CUA3; UCUS_CUA4; UCUS_PONO; UCUS_CSCD; UCUS_ECAR; UCUS_TXCO; UCUS_TOWN; UCUS_CFC5;
+   CFC5Combine; UCUS_CRL1; UCUS_CRL2; UCUS_CRL3;
+
 
 
    constructor(private miService: MIService, private userService: UserService,
@@ -144,6 +153,101 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
          this.isEnabledButtons = false;
          this.resetGlobleVar();
       }
+   }
+
+
+   public SaveCustomerDetails() {
+
+      this.setBusy(true);
+      this.M3APICallCRS610MI_ChgBasicData();
+      this.M3APICallCRS610MI_ChgFinancial();
+      this.ClearCustomerDetails();
+      alert("Customer info has been updated!");
+
+   }
+
+   private M3APICallCRS610MI_ChgBasicData() {
+
+      const request: IMIRequest = {
+         program: 'CRS610MI',
+         transaction: 'ChgBasicData',
+         outputFields: ['CUNO'],
+         maxReturnedRecords: 10,
+      };
+
+      const inputRecord: MIRecord = new MIRecord();
+      inputRecord.setString('CUNO', this.selectedCustomerID);
+      inputRecord.setString('CUA1', this.UCUS_CUA1);
+      inputRecord.setString('CUA2', this.UCUS_CUA2);
+      inputRecord.setString('CUA3', this.UCUS_CUA3);
+      inputRecord.setString('CUA4', this.UCUS_CUA4);
+
+      inputRecord.setString('PONO', this.UCUS_PONO);
+      inputRecord.setString('TOWN', this.UCUS_TOWN);
+      inputRecord.setString('ECAR', this.UCUS_ECAR);
+
+      inputRecord.setString('PHNO', this.UCUS_PHNO);
+      inputRecord.setString('PHN2', this.UCUS_PHN2);
+      inputRecord.setString('YREF', this.UCUS_YREF);
+      inputRecord.setString('YRE2', this.UCUS_YRE2);
+      inputRecord.setString('CFC5', this.UCUS_CFC5);
+      request.record = inputRecord;
+
+      this.miService.execute(request).subscribe((response: IMIResponse) => {
+         this.setBusy(false);
+         if (!response.hasError()) {
+
+
+
+         }
+      }, (error) => {
+         this.setBusy(false);
+         // Handle error
+         this.logError('Unable to execute API : getCustomerList> ' + error);
+      });
+   }
+
+
+   private M3APICallCRS610MI_ChgFinancial() {
+
+      const request: IMIRequest = {
+         program: 'CRS610MI',
+         transaction: 'ChgFinancial',
+         outputFields: [''],
+         maxReturnedRecords: 10,
+      };
+
+      const inputRecord: MIRecord = new MIRecord();
+      inputRecord.setString('CUNO', this.selectedCustomerID);
+      inputRecord.setString('CRL2', this.UCUS_CRL2);
+      inputRecord.setString('CRL3', this.UCUS_CRL3);
+      request.record = inputRecord;
+
+      this.miService.execute(request).subscribe((response: IMIResponse) => {
+         this.setBusy(false);
+         if (!response.hasError()) {
+
+         }
+      }, (error) => {
+         this.setBusy(false);
+         // Handle error
+         this.logError('Unable to execute API : getCustomerList> ' + error);
+      });
+   }
+
+   public ClearCustomerDetails() {
+
+      this.IsTabCustomerDetailsUpdateSelected = false;
+      this.IsTabCustomerDetailsSelected = true;
+
+   }
+
+   public UpdateCustomerDetails() {
+
+
+      this.IsTabCustomerDetailsUpdateSelected = true;
+      this.IsTabCustomerDetailsSelected = false;
+
    }
 
 
@@ -285,7 +389,11 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
       var stateCustomerFilter = state.filter.filters;
       var arryStateCustomerFilter: any = {};
       arryStateCustomerFilter = stateCustomerFilter[0];
-      var arryStateCustomerFilterValue = arryStateCustomerFilter.value;
+
+      console.log("**************************");
+      console.log(arryStateCustomerFilter.value);
+      var filterValue = arryStateCustomerFilter.value.toUpperCase();
+      var arryStateCustomerFilterValue = filterValue;
       this.stateCustomer = state;
       this.getCustomerList(arryStateCustomerFilterValue);
    }
@@ -662,6 +770,25 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
       delete this.PFMonth1; delete this.PFMonth2; delete this.PFMonth3;
       delete this.AGMonth1; delete this.AGMonth2; delete this.AGMonth3;
 
+      delete this.UCUS_PHNO;
+      delete this.UCUS_PHN2;
+      delete this.UCUS_YREF;
+      delete this.UCUS_YRE2;
+      delete this.UCUS_CUNM;
+      delete this.UCUS_CUA1;
+      delete this.UCUS_CUA2;
+      delete this.UCUS_CUA3;
+      delete this.UCUS_CUA4;
+      delete this.UCUS_PONO;
+      delete this.UCUS_CSCD;
+      delete this.UCUS_ECAR;
+      delete this.UCUS_CFC5;
+      delete this.UCUS_TOWN;
+      delete this.UCUS_CRL1;
+      delete this.UCUS_CRL3;
+      delete this.UCUS_CRL2;
+      delete this.CFC5Combine;
+
    }
 
 
@@ -768,7 +895,7 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
       const request: IMIRequest = {
          program: 'CRS610MI',
          transaction: 'LstByNumber',
-         outputFields: ['CUNO', 'CUNM', 'CUA1', 'CUA2', 'CUA3', 'CUA4', 'YREF', 'PHNO', 'CUCL', 'SMCD', 'CRLM', 'CRL2', 'CRL3', 'ODUD', 'PYNO', 'CUCD', 'CFC5'],
+         outputFields: ['CUNO', 'CUNM', 'CUA1', 'CUA2', 'CUA3', 'CUA4', 'YREF', 'YRE2', 'PHNO', 'CUCL', 'SMCD', 'CRLM', 'CRL2', 'CRL3', 'ODUD', 'PYNO', 'CUCD', 'CFC5', 'PHN2', 'TOWN', 'ECAR', 'CSCD', 'PONO'],
          maxReturnedRecords: 10,
       };
 
@@ -804,6 +931,7 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
             if (this.CustomerData.YREF.length == 0) {
                this.CustomerData.YREF = "(Not available)";
             }
+
             if (this.CustomerData.PHNO.length == 0) {
                this.CustomerData.YREF = "(Not available)";
             }
@@ -825,12 +953,17 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
             }
             this.CUSCRDLimit2 = this.CustomerData.CRL2;
             this.CUSCRDLimit3 = this.CustomerData.CRL3;
+            this.UCUS_CRL2 = this.CUSCRDLimit2;
+            this.UCUS_CRL3 = this.CUSCRDLimit3;
+
+
             this.CUSCRDLimit4 = this.CustomerData.ODUD;
             this.CUSSales = this.CustomerData.SMCD;
 
             this.CUSPayer = this.CustomerData.PYNO;
             this.CUSCurrency = this.CustomerData.CUCD;
             this.CUSPersonalGuar = this.CustomerData.CFC5;
+            this.UCUS_CFC5 = this.CustomerData.CFC5;
             switch (this.CUSPersonalGuar) {
                case "Y":
                   this.CUSPersonalGuarText = "Guarantee Provided";
@@ -838,7 +971,28 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
                case "N":
                   this.CUSPersonalGuarText = "No Guarantee";
                   break;
+               default:
+                  this.CUSPersonalGuarText = "Unspecified";
             }
+
+            this.CFC5Combine = this.CUSPersonalGuar + " - " + this.CUSPersonalGuarText;
+
+            this.UCUS_PHNO = this.CustomerData.PHNO;
+            this.UCUS_PHN2 = this.CustomerData.PHN2;
+            this.UCUS_YREF = this.CustomerData.YREF;
+            this.UCUS_YRE2 = this.CustomerData.YRE2;
+            this.UCUS_CUNM = this.CustomerData.CUNM;
+            this.UCUS_CUA1 = this.CustomerData.CUA1;
+            this.UCUS_CUA2 = this.CustomerData.CUA2;
+            this.UCUS_CUA3 = this.CustomerData.CUA3;
+            this.UCUS_CUA4 = this.CustomerData.CUA4;
+            this.UCUS_PONO = this.CustomerData.PONO;
+            this.UCUS_CSCD = this.CustomerData.CSCD;
+            this.UCUS_ECAR = this.CustomerData.ECAR;
+            // this.UCUS_TXCO = this.CustomerData.TXCO;
+            this.UCUS_TOWN = this.CustomerData.TOWN;
+
+
          }
       }, (error) => {
          this.setBusy(false);
@@ -847,6 +1001,24 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
       });
 
    }
+
+   onCFC5Change(cfc5) {
+      this.UCUS_CFC5 = cfc5;
+      switch (this.UCUS_CFC5) {
+         case "Y":
+            this.CUSPersonalGuarText = "Guarantee Provided";
+            break;
+         case "N":
+            this.CUSPersonalGuarText = "No Guarantee";
+            break;
+         default:
+            this.CUSPersonalGuarText = "Unspecified";
+      }
+      this.CFC5Combine = this.UCUS_CFC5 + " - " + this.CUSPersonalGuarText;
+
+   }
+
+
    dt;
    SelectedDateForInvoice(x) {
       this.dt = x;
@@ -1044,7 +1216,7 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
             //Check row count
             console.log(response);
             delete this.CUSTextNew;
-            alert("Customer note successfully updated!");
+            alert("Customer note has been updated!");
 
          } else {
 
@@ -1086,17 +1258,64 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
    }
 
    ReleaseOrder() {
-      alert(this.selectedOrderID);
+
+      this.setBusy(true);
       if (this.selectedOrderID == "" || this.selectedOrderID == "undefined") {
 
-      } else {
-         this.arService.ReleaseOrder(this.selectedOrderID, "300").subscribe((res) => {
+         alert("Please select an order!")
 
-            alert(res);
+      } else {
+         this.arService.ReleaseOrder(this.selectedOrderID, this.FACI).subscribe((res) => {
+            this.setBusy(true);
+            alert("Order has been Released!")
          });
       }
 
    }
+
+   ChangeCOStopManually(value) {
+
+      if (value == "NO") {
+
+      } else {
+         this.selectedOrderID = this.selectedOrderID.trim();
+         if (this.selectedOrderID == "" || this.selectedOrderID == "undefined") {
+
+            alert("Please select an order!")
+
+         } else {
+
+
+            var c = confirm("Are you sure you want to update Co stop of " + this.selectedOrderID + " order?");
+
+            if (c == true) {
+               this.setBusy(true);
+               this.arService.ReleaseOrderManually(this.selectedOrderID, this.FACI, value).subscribe((res) => {
+
+
+                  this.setBusy(false);
+                  alert("Order CO Stop has been updated!")
+               }, (error) => {
+                  this.setBusy(false);
+                  // Handle error
+                  console.log('Error occurd when ChangeCOStopManually');
+               });
+            } else {
+
+            }
+
+
+         }
+
+
+
+      }
+
+   }
+
+
+
+
    private DelCredReviewCheck(key) {
 
       this.setBusy(true);

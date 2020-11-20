@@ -105,14 +105,14 @@
                   </div>
                </div>-->
                <kendo-tabstrip>
-                  <kendo-tabstrip-tab [title]="'Customer Details'" [selected]="true">
+                  <kendo-tabstrip-tab [title]="'Customer Details'" [selected]="IsTabCustomerDetailsSelected">
                      <ng-template kendoTabContent>
 
                         <div style="overflow-y: visible; padding-top: 8px; ">
                            <!--class="row"-->
                            <div class="one-half column" style="    margin-left: 5px">
                               <div class="row">
-                                 <div class="one-half column">
+                                 <div class="">
                                     <div class="field">
                                        <label for="first-name" class="inputfield">Name</label>
                                        <input type="text" [(ngModel)]="CUSName" id="first-name" name="first-name"
@@ -164,11 +164,15 @@
 
                                        </div>
                                     </div>
+                                    <div class="field" style="position: absolute; left: 67px;">
+                                       <button class="reprintInvoicebtn" type="button" id="primary-action-two"
+                                          (click)="UpdateCustomerDetails()"
+                                          style="float: right; position: inherit; width: 80px; right:-20px ">Edit
+                                          info</button>
+                                    </div>
 
                                  </div>
-                                 <div class="one-half column">
 
-                                 </div>
                               </div>
 
                            </div>
@@ -176,16 +180,44 @@
                            <div class="one-half column">
 
                               <div class="container">
-                                 <button class="reprintInvoicebtn" style="    float: right;
+
+                                 <div style="float: right; ">
+                                    <button class="reprintInvoicebtn" style="    float: right;
                                  right: 8px;
                                  position: inherit;
                                  margin-bottom: 8px; " type="button" id="secondary-action-one"
-                                    (click)="AddReveive()">Review</button>
-                                 <button class="reprintInvoicebtn" style="    float: right;
+                                       (click)="AddReveive()">Review</button>
+                                 </div>
+                                 <div style="float: right;">
+                                    <button class="reprintInvoicebtn" style="    float: right;
                                     right: 8px;
-                                    position: inherit;
+                                    position: inherit; margin-left: 5px;
                                     margin-bottom: 8px; " type="button" id="secondary-action-one"
-                                    (click)="ReleaseOrder()">Release</button>
+                                       (click)="ReleaseOrder()">Release</button>
+                                 </div>
+                                 <div style="float: right;">
+                                    <select style="position: inherit; margin-left: 5px; width: 130px;"
+                                       class="reprintInvoicebtn" name="COStop" id="CFC5" #COStop
+                                       (change)='ChangeCOStopManually(COStop.value)'>
+                                       <option value="NO" selected style="text-align: center;"> Manual
+                                       </option>
+                                       <option value="0">0 - No Stop</option>
+                                       <option value="1">1 - Credit Limit 1</option>
+                                       <option value="2">2 - Credit Limit 2</option>
+                                       <option value="3">3 - Credit Limit 3</option>
+                                       <option value="4">4 - Credit Limit 4</option>
+                                       <option value="5">5 - Connected to LOC</option>
+                                       <option value="6">6 - Credit Limit 6</option>
+                                       <option value="7">7 - Man Set Stop</option>
+                                       <option value="8">8 - Man Set Stop</option>
+                                       <option value="9">9 - Man Rel Stop</option>
+                                    </select>
+                                 </div>
+
+
+
+
+
                               </div>
 
                               <div class="container">
@@ -237,39 +269,6 @@
                   <kendo-tabstrip-tab [title]="'Customer Notes'">
                      <ng-template kendoTabContent>
 
-                        <!--  <div style="width: 100%; ">
-                           <kendo-splitter orientation="vertical" style="height: 350px; width: 100%;">
-
-                              <kendo-splitter-pane>
-                                 <label for="date-field-normal" style="margin: 4px;" class="label">Customer
-                                    Note:</label>
-                                 <textarea class="textarea" style="width: 100%; height:170px " name="description-max"
-                                    [readonly]="true" [(ngModel)]="CUSText">
-
-                                                          </textarea>
-
-                              </kendo-splitter-pane>
-
-                              <kendo-splitter-pane size="140px">
-                                 <div class="pane-content">
-                                    <label for="date-field-normal" style="margin: 4px;" class="label">Add a new
-                                       note:</label>
-                                    <textarea class="textarea" style="width: 60%; height:100px " name="description-max"
-                                       [(ngModel)]="CUSTextNew" cols="55">
-
-                                                          </textarea>
-
-
-                                    <button class="reprintInvoicebtn" type="button" id="primary-action-two"
-                                       (click)="SaveCustomerText()" style="float: right; right: 0px; bottom: 1px; ">Save
-                                       New Note</button>
-                                 </div>
-                              </kendo-splitter-pane>
-
-
-                           </kendo-splitter>
-                        </div>-->
-
                         <div style="overflow-y: visible; padding-top: 8px; padding-right: 4px; ">
 
                            <label for="date-field-normal" style="margin: 4px;" class="label">Customer
@@ -292,6 +291,138 @@
                                  (click)="SaveCustomerText()" style="float: right; position: inherit;">Save
                                  New Note</button>
                            </div>
+
+
+
+
+                        </div>
+
+                     </ng-template>
+                  </kendo-tabstrip-tab>
+
+                  <kendo-tabstrip-tab [title]="'Update Cutomer Details'" *ngIf="IsTabCustomerDetailsUpdateSelected"
+                     [selected]="true">
+                     <ng-template kendoTabContent>
+
+                        <div class="row" style="overflow-y: visible; padding-top: 8px; padding-right: 4px; ">
+
+                           <div class="one-half column">
+
+
+                              <div class="field">
+                                 <label for="first-name" class="inputfield">Name</label>
+                                 <input type="text" [(ngModel)]="UCUS_CUNM" name="first-name" />
+                              </div>
+                              <div class="field">
+                                 <label for="first-name" class="inputfield">Address Line1</label>
+                                 <input type="text" [(ngModel)]="UCUS_CUA1" name="first-name" />
+                              </div>
+                              <div class="field">
+                                 <label for="first-name" class="inputfield">Address Line2</label>
+                                 <input type="text" [(ngModel)]="UCUS_CUA2" name="first-name" />
+                              </div>
+                              <div class="field">
+                                 <label for="first-name" class="inputfield">Address Line3</label>
+                                 <input type="text" [(ngModel)]="UCUS_CUA3" name="first-name" />
+                              </div>
+                              <div class="field">
+                                 <label for="first-name" class="inputfield">Address Line4</label>
+                                 <input type="text" [(ngModel)]="UCUS_CUA4" name="first-name" />
+                              </div>
+                              <div class="container">
+                                 <div class="field" style="width: 70px;">
+                                    <label for="first-name" class="inputfield">Postal Code</label>
+                                    <input type="text" [(ngModel)]="UCUS_PONO" name="first-name" />
+
+                                 </div>
+                                 <div class="field" style="width: 140px; margin-left: 10px;">
+                                    <label for="first-name" class="inputfield">City</label>
+                                    <input type="text" [(ngModel)]="UCUS_TOWN" name="first-name" />
+
+                                 </div>
+                              </div>
+                              <div class="container">
+                                 <div class="field" style="width: 100px;">
+                                    <label for="first-name" class="inputfield">State</label>
+                                    <input type="text" [(ngModel)]="UCUS_ECAR" name="first-name" />
+
+                                 </div>
+
+                              </div>
+
+
+
+
+
+                           </div>
+
+                           <div class="one-half column">
+
+                              <div class="field">
+                                 <label for="first-name" class="inputfield">Account Phone1</label>
+                                 <input type="text" [(ngModel)]="UCUS_PHNO" name="first-name" />
+                              </div>
+                              <div class="field">
+                                 <label for="first-name" class="inputfield">Sales Phone</label>
+                                 <input type="text" [(ngModel)]="UCUS_PHN2" name="first-name" />
+                              </div>
+                              <div class="field">
+                                 <label for="first-name" class="inputfield">Account Contact2</label>
+                                 <input type="text" [(ngModel)]="UCUS_YREF" name="first-name" />
+                              </div>
+                              <div class="field">
+                                 <label for="first-name" class="inputfield">Sales Contact</label>
+                                 <input type="text" [(ngModel)]="UCUS_YRE2" name="first-name" />
+                              </div>
+                              <div class="container">
+
+                                 <div class="field" style="width: 120px">
+                                    <label for="first-name" class="inputfield">Director's Guar:</label>
+                                    <input type="text" [(ngModel)]="CFC5Combine" name="first-name" [readonly]="true" />
+
+
+                                 </div>
+
+
+                                 <div class="field" style="width: 110px">
+                                    <label for="first-name" class="inputfield" style="margin-left: 5px;">New
+                                       Value</label>
+                                    <select style="left:6px; font-size: larger; height: 23px;  "
+                                       class="reprintInvoicebtn" name="CFC5" id="CFC5" #CFC5
+                                       (change)='onCFC5Change(CFC5.value)'>
+                                       <option value=" " selected>Unspecified</option>
+                                       <option value="Y">Guarantee Provided</option>
+                                       <option value="N">No Guarantee</option>
+                                    </select>
+                                 </div>
+                              </div>
+
+                              <div class="container">
+                                 <div class="field" style="width: 100px;">
+                                    <label for="first-name" class="inputfield">Credit Limit 2</label>
+                                    <input type="text" [(ngModel)]="UCUS_CRL2" name="first-name" />
+
+                                 </div>
+                                 <div class="field" style="width: 100px; margin-left: 10px;">
+                                    <label for="first-name" class="inputfield">Credit Limit 3</label>
+                                    <input type="text" [(ngModel)]="UCUS_CRL3" name="first-name" />
+
+                                 </div>
+                              </div>
+
+
+                              <div class="field" style="display: flexbox;  ;">
+                                 <button class="reprintInvoicebtn" type="button" id="primary-action-two"
+                                    (click)="SaveCustomerDetails()"
+                                    style="float: left; position: inherit; width: 60px;">Save</button>
+                                 <button class="reprintInvoicebtn" type="button" id="primary-action-two"
+                                    (click)="ClearCustomerDetails()"
+                                    style="float: left; position: inherit; width: 60px;">Back</button>
+                              </div>
+
+                           </div>
+
+
 
 
 

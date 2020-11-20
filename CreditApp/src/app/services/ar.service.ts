@@ -48,6 +48,13 @@ export class ARService {
 
    }
 
+   public ReleaseOrderManually(ORNO: string, FACI: string, Status: string) {
+
+      const dat = { "ORNO": ORNO, "FACI": FACI, "Status": Status };
+
+      return this.httpClient.post(`${this.apiURL}/ReleaseOrderManually/`, dat);
+
+   }
 
 
    public GetVoucherList(PYNO: string) {
