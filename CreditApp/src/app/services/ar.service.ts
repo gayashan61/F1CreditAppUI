@@ -1,14 +1,30 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { TextBoxDirective } from '@progress/kendo-angular-inputs';
 @Injectable({
    providedIn: 'root'
 })
 export class ARService {
 
-   apiURL = 'https://gallery.gunnersens.com.au:8084/Service/ForestOneDataService/AR';
+   apiURL = 'https://gallery.gunnersens.com.au:8094/Service/ForestOneDataService/AR';
 
    constructor(private httpClient: HttpClient) { }
 
+
+   public GetEnvironmentDetails() {
+
+      const dat = { 'FACI': '' };
+      return this.httpClient.post(`${this.apiURL}/GetEnvironmentDetails/`, dat);
+
+   }
+
+
+   public GetUserData(USID: string) {
+
+      const dat = { 'USID': USID };
+      return this.httpClient.post(`${this.apiURL}/GetUserData/`, dat);
+
+   }
 
    public GetAROrders(faci: string) {
 
@@ -40,17 +56,17 @@ export class ARService {
 
    }
 
-   public ReleaseOrder(ORNO: string, FACI: string) {
+   public ReleaseOrder(ORNO: string, FACI: string, USID: string, CONO: string, DIVI: string) {
 
-      const dat = { "ORNO": ORNO, "FACI": FACI };
+      const dat = { "ORNO": ORNO, "FACI": FACI, "USID": USID, "CONO": CONO, "DIVI": DIVI };
 
       return this.httpClient.post(`${this.apiURL}/ReleaseOrder/`, dat);
 
    }
 
-   public ReleaseOrderManually(ORNO: string, FACI: string, Status: string) {
+   public ReleaseOrderManually(ORNO: string, FACI: string, Status: string, USID: string, CONO: string, DIVI: string) {
 
-      const dat = { "ORNO": ORNO, "FACI": FACI, "Status": Status };
+      const dat = { "ORNO": ORNO, "FACI": FACI, "Status": Status, "USID": USID, "CONO": CONO, "DIVI": DIVI };
 
       return this.httpClient.post(`${this.apiURL}/ReleaseOrderManually/`, dat);
 
@@ -89,8 +105,10 @@ export class ARService {
 
    }
 
-   public SplitToLines(TEXT: string) {
-      const dat = { "TEXT": TEXT };
+   public SplitToLines(TEXT: string, TXID: string, TXVR: string, LNCD: string, USID: string) {
+
+      const dat = { "TEXT": TEXT, "TXID": TXID, "TXVR": TXVR, "LNCD": LNCD, "USID": USID };
+      console.log(dat);
       return this.httpClient.post(`${this.apiURL}/SplitToLines/`, dat);
 
    }

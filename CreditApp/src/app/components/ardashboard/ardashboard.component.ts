@@ -34,9 +34,11 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
    userContext = {} as IUserContext;
    isEnabledButtons: boolean;
    EnableCustomerTextBox: boolean = false;
+   isSelected: boolean = true;
 
    FACI: string = "300";
    isBusyMyComponent = false;
+   isBusyCustomerTextComponent = false;
    /**Grid Properties */
    private gridData: GridDataResult; // = process(this.OrderList, this.state);
    private gridCustomerData: GridDataResult; // = process(this.OrderList, this.state);
@@ -113,6 +115,7 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
          this.setBusy(false);
          this.logInfo('onClickLoad: Received user context');
          this.userContext = userContext;
+
          this.updateUserValues(userContext);
       }, (error) => {
          this.setBusy(false);
@@ -131,6 +134,13 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
       this.FACI = FACI;
       this.setBusy(true);
       delete this.OrderList;
+      this.ReloadOrdersInGrid();
+   }
+
+
+   ReloadOrdersInGrid() {
+
+      delete this.gridData;
       this.arService.GetAROrders(this.FACI).subscribe((res) => {
          this.setBusy(false);
          this.OrderList = res;
@@ -138,6 +148,7 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
          // this.responce.forEach(element => { });
 
       });
+
    }
 
    /**Region UI Click Events */
@@ -158,11 +169,11 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
 
    public SaveCustomerDetails() {
 
-      this.setBusy(true);
+      this.setBusyCustomerText(true);
       this.M3APICallCRS610MI_ChgBasicData();
       this.M3APICallCRS610MI_ChgFinancial();
       this.ClearCustomerDetails();
-      alert("Customer info has been updated!");
+
 
    }
 
@@ -177,6 +188,7 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
 
       const inputRecord: MIRecord = new MIRecord();
       inputRecord.setString('CUNO', this.selectedCustomerID);
+      inputRecord.setString('CUNM', this.UCUS_CUNM);
       inputRecord.setString('CUA1', this.UCUS_CUA1);
       inputRecord.setString('CUA2', this.UCUS_CUA2);
       inputRecord.setString('CUA3', this.UCUS_CUA3);
@@ -194,15 +206,12 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
       request.record = inputRecord;
 
       this.miService.execute(request).subscribe((response: IMIResponse) => {
-         this.setBusy(false);
+
          if (!response.hasError()) {
-
-
-
+            this.GetCustomerDataByMI(this.selectedCustomerID);
          }
       }, (error) => {
-         this.setBusy(false);
-         // Handle error
+
          this.logError('Unable to execute API : getCustomerList> ' + error);
       });
    }
@@ -224,12 +233,12 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
       request.record = inputRecord;
 
       this.miService.execute(request).subscribe((response: IMIResponse) => {
-         this.setBusy(false);
+         this.setBusyCustomerText(false);
          if (!response.hasError()) {
-
+            this.GetCustomerDataByMI(this.selectedCustomerID);
          }
       }, (error) => {
-         this.setBusy(false);
+         this.setBusyCustomerText(false);
          // Handle error
          this.logError('Unable to execute API : getCustomerList> ' + error);
       });
@@ -281,6 +290,7 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
    myDate: Date;
    public onSelectedOrderChange(e) {
 
+      this.IsAgingDataLoaded = false;
       this.resetGlobleVar();
       this.disableTabs = false;
       //Change Invoice Tab to Aging
@@ -308,10 +318,14 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
       //Get Date
       this.m = this.GetAgeDistrib();
       this.y = this.GetPmtForcast();
+
+      this.LoadForcastData();
    }
 
+   IsAgingDataLoaded: boolean = true;
    public onSelectedCustomerChange(e) {
 
+      this.IsAgingDataLoaded = false;
       this.resetGlobleVar();
 
       this.disableTabs = false;
@@ -332,13 +346,18 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
 
       this.m = this.GetAgeDistrib();
       this.y = this.GetPmtForcast();
-      this.setOpenTabTo = true;;
+      this.setOpenTabTo = true;
+
+      this.LoadForcastData();
+
    }
 
 
    setOpenTabTo = true;
    myDateTo;
    myDateFrom;
+   filterDateFrom;
+   filterDateTo;
    public OnDateChangesFromDate(e) {
       var dt = new Date(e);
       this.myDateTo = this.datepipe.transform(dt, 'yyyy-MM-dd');
@@ -742,6 +761,9 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
 
    resetGlobleVar() {
 
+      delete this.filterDateFrom;
+      delete this.filterDateTo;
+      this.isSelected = true;
       delete this.gridDataVoucherList;
       delete this.gridViewLastPaymentInvoice;
       this.ReprintInvoiceNo = "";
@@ -874,7 +896,7 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
 
    BackOrderValue;
    GetBackOrder(cuno) {
-
+      this.setBusy(true);
       this.arService.GetBackOrderValue(cuno).subscribe((res) => {
          console.log(res);
          this.BackOrderValue = res;
@@ -890,7 +912,7 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
    GetCustomerDataByMI(_CUNO) {
 
 
-      this.setBusy(true);
+      this.setBusyCustomerText(true);
 
       const request: IMIRequest = {
          program: 'CRS610MI',
@@ -905,7 +927,7 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
       request.record = inputRecord;
 
       this.miService.execute(request).subscribe((response: IMIResponse) => {
-         this.setBusy(false);
+         this.setBusyCustomerText(false);
          if (!response.hasError()) {
 
             this.CustomerData = response.items[0];
@@ -995,7 +1017,7 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
 
          }
       }, (error) => {
-         this.setBusy(false);
+         this.setBusyCustomerText(false);
          // Handle error
          this.logError('Unable to execute API ' + error);
       });
@@ -1042,17 +1064,23 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
          // this.responce.forEach(element => { });
 
       });
+
+
    }
 
    private setBusy(isBusy: boolean) {
       this.isBusyMyComponent = isBusy;
    }
 
+   private setBusyCustomerText(isBusy: boolean) {
+      this.isBusyCustomerTextComponent = isBusy;
+   }
+
    //***Region Retrive Customer Text***
    private GetCustomerText(_CUNO) {
       //List of MI's to get the textbox linked to a customer
       //This one gets the TextID
-      this.setBusy(true);
+
 
       const request: IMIRequest = {
          program: 'CRS980MI',
@@ -1069,7 +1097,7 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
       request.record = inputRecord;
 
       this.miService.execute(request).subscribe((response: IMIResponse) => {
-         this.setBusy(false);
+
          if (!response.hasError()) {
             //Check row count
             this.CurrentCustomerTXID = response.item.TXID;
@@ -1091,7 +1119,6 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
 
       //List of MI's to get the textbox linked to a customer
       //This one gets the TextID
-      this.setBusy(true);
 
       const request: IMIRequest = {
          program: 'CRS980MI',
@@ -1107,7 +1134,7 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
       request.record = inputRecord;
 
       this.miService.execute(request).subscribe((response: IMIResponse) => {
-         this.setBusy(false);
+
          if (!response.hasError()) {
             //Check row count
 
@@ -1121,7 +1148,7 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
 
 
       }, (error) => {
-         this.setBusy(false);
+
          // Handle error
 
       });
@@ -1131,7 +1158,7 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
       this.CUSText = "";
       //List of MI's to get the textbox linked to a customer
       //This one gets the TextID
-      this.setBusy(true);
+      delete this.CUSText;
       this.CUSText = "";
 
       const request: IMIRequest = {
@@ -1150,7 +1177,7 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
       request.record = inputRecord;
 
       this.miService.execute(request).subscribe((response: IMIResponse) => {
-         this.setBusy(false);
+
          if (!response.hasError()) {
             //Check row count
             response.items.forEach(element => {
@@ -1166,71 +1193,30 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
 
 
       }, (error) => {
-         this.setBusy(false);
-         // Handle error
 
       });
    }
 
    //***Region Save Customer Text***
+   isCustomerTextSaved: boolean = true;
    responceTextList;
+   aa = 0;
    SaveCustomerText() {
       //when button save is pressed it will get the textbox from the bottom richtextbox, split it into 60 chars per line,Add each line to the MI
-      this.setBusy(true);
+      this.setBusyCustomerText(true);
+
       this.CUSTextNew = this.CUSTextNew + "\n";
-      this.arService.SplitToLines(this.CUSTextNew).subscribe((res) => {
-         this.setBusy(false);
-         this.responceTextList = res;
-         this.responceTextList.forEach(element => {
-            this.SaveCustomerTextLinesAPI(element);
-         });
+      this.arService.SplitToLines(this.CUSTextNew, this.CurrentCustomerTXID, this.CurrentCustomerTXVR, this.CurrentCustomerLNCD, this.userContext.USID).subscribe((res) => {
+
+         this.setBusyCustomerText(false);
+         delete this.CUSTextNew;
+         this.GetCustomerText(this.selectedCustomerID);
 
       });
 
    }
-   private SaveCustomerTextLinesAPI(TEXT) {
-      //List of MI's to get the textbox linked to a customer
-      //This one gets the TextID
-      this.setBusy(true);
 
 
-      const request: IMIRequest = {
-         program: 'CRS980MI',
-         transaction: 'AddTxtBlockLine',
-         outputFields: ['TX60'],
-         maxReturnedRecords: 100,
-      };
-
-      // represent input records
-      const inputRecord: MIRecord = new MIRecord();
-      inputRecord.setString('TXID', this.CurrentCustomerTXID);
-      inputRecord.setString('TXVR', this.CurrentCustomerTXVR);
-      inputRecord.setString('LNCD', this.CurrentCustomerLNCD);
-      inputRecord.setString('TFIL', 'OSYTXH');
-      inputRecord.setString('TX60', TEXT);
-      request.record = inputRecord;
-
-      this.miService.execute(request).subscribe((response: IMIResponse) => {
-         this.setBusy(false);
-         if (!response.hasError()) {
-            //Check row count
-            console.log(response);
-            delete this.CUSTextNew;
-            alert("Customer note has been updated!");
-
-         } else {
-
-         }
-
-
-      }, (error) => {
-         this.setBusy(false);
-         // Handle error
-
-      });
-
-      this.GetCustomerText(this.selectedCustomerID);
-   }
 
 
 
@@ -1261,13 +1247,18 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
 
       this.setBusy(true);
       if (this.selectedOrderID == "" || this.selectedOrderID == "undefined") {
-
+         this.setBusy(false);
          alert("Please select an order!")
 
       } else {
-         this.arService.ReleaseOrder(this.selectedOrderID, this.FACI).subscribe((res) => {
-            this.setBusy(true);
-            alert("Order has been Released!")
+         this.arService.ReleaseOrder(this.selectedOrderID, this.FACI, this.userContext.USID, this.userContext.CONO, this.userContext.DIVI).subscribe((res) => {
+            this.setBusy(false);
+            alert(res);
+            this.OrderList = this.OrderList.filter(obj => obj.OAORNO !== this.selectedOrderID);
+            this.gridData = process(this.OrderList, this.state);
+            this.resetGlobleVar();
+
+
          });
       }
 
@@ -1290,11 +1281,12 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
 
             if (c == true) {
                this.setBusy(true);
-               this.arService.ReleaseOrderManually(this.selectedOrderID, this.FACI, value).subscribe((res) => {
+               this.arService.ReleaseOrderManually(this.selectedOrderID, this.FACI, value, this.userContext.USID, this.userContext.CONO, this.userContext.DIVI).subscribe((res) => {
 
-
+                  console.log(res);
                   this.setBusy(false);
-                  alert("Order CO Stop has been updated!")
+                  this.ReloadOrdersInGrid();
+                  alert(res);
                }, (error) => {
                   this.setBusy(false);
                   // Handle error
@@ -1445,7 +1437,9 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
    //**Load ForacstData on click */
 
    LoadForcastData() {
+
       this.setBusy(true);
+      console.log('******* Call Open*********');
       this.selectedCustomerID; // V1
       var _QTTP = "1";
       var _TODT = "";
@@ -1489,9 +1483,9 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
       // this.setBusy(true);
 
       this.formService.executeBookmark(bookmark).subscribe((r) => {
-         // this.setBusy(false);
+         //
          this.onBookmarkResponse(r);
-
+         this.IsAgingDataLoaded = true;
       }, (r) => {
          //this.onError(r);
       });
@@ -1504,6 +1498,7 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
    TTUR; TTEV; TNOI; PTUR; PTEV; PNOI; LIDT; LPDT;
    TDUE; CRL1; CRL2; TOSB; ACRT; CRA1; CRA2; CRA3; CR01; CR02; CR03
    private onBookmarkResponse(response: IFormResponse): void {
+
       if (response.result !== 0) {
          this.onError();
          return;
@@ -1534,16 +1529,12 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
 
          var c = 0;
          this.CL = panel.controlList;
-         this.controlInfos.forEach(element => {
 
-            var x = element;
-            // console.log(c + '>' + element.control.id + ' - ' + element.control.name + ' - ' + element.control.value);
-            c++;
-         });
-
+         console.log('******* Call Close*********');
+         this.setBusy(false);
       }
 
-      // this.setBusy(false);
+
    }
    private onError(): void {
       const message = "Message" || 'Unable to open bookmark';

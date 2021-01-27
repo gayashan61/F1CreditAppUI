@@ -185,21 +185,21 @@
                                     <button class="reprintInvoicebtn" style="    float: right;
                                  right: 8px;
                                  position: inherit;
-                                 margin-bottom: 8px; " type="button" id="secondary-action-one"
-                                       (click)="AddReveive()">Review</button>
+                                 margin-bottom: 8px; " type="button" id="secondary-action-one" (click)="AddReveive()"
+                                       *ngIf="!isEnabledButtons">Review</button>
                                  </div>
                                  <div style="float: right;">
                                     <button class="reprintInvoicebtn" style="    float: right;
                                     right: 8px;
                                     position: inherit; margin-left: 5px;
                                     margin-bottom: 8px; " type="button" id="secondary-action-one"
-                                       (click)="ReleaseOrder()">Release</button>
+                                       (click)="ReleaseOrder()" *ngIf="!isEnabledButtons">Release</button>
                                  </div>
                                  <div style="float: right;">
                                     <select style="position: inherit; margin-left: 5px; width: 130px;"
                                        class="reprintInvoicebtn" name="COStop" id="CFC5" #COStop
-                                       (change)='ChangeCOStopManually(COStop.value)'>
-                                       <option value="NO" selected style="text-align: center;"> Manual
+                                       (change)='ChangeCOStopManually(COStop.value)' *ngIf="!isEnabledButtons">
+                                       <option value="NO" [selected]="isSelected" style="text-align: center;"> Manual
                                        </option>
                                        <option value="0">0 - No Stop</option>
                                        <option value="1">1 - Credit Limit 1</option>
@@ -252,7 +252,8 @@
                                     </kendo-grid-column>
                                     <kendo-grid-column field="ESCUAM" title="Amount" width="100">
                                     </kendo-grid-column>
-                                    <kendo-grid-column field="ESRGDT" title="Date (RGDT)" width="100">
+                                    <kendo-grid-column field="ESRGDT" title="Date (RGDT)" width="100"
+                                       format='{MM/dd/yyyy}'>
                                     </kendo-grid-column>
                                  </kendo-grid>
 
@@ -269,32 +270,37 @@
                   <kendo-tabstrip-tab [title]="'Customer Notes'">
                      <ng-template kendoTabContent>
 
-                        <div style="overflow-y: visible; padding-top: 8px; padding-right: 4px; ">
 
-                           <label for="date-field-normal" style="margin: 4px;" class="label">Customer
-                              Note:</label>
-                           <textarea class="textarea" style="width: 100%; height:170px " name="description-max"
-                              [readonly]="true" [(ngModel)]="CUSText">
+                        <div class="row" soho-busyindicator [activated]="isBusyCustomerTextComponent" [blockUI]="true"
+                           [displayDelay]="0">
+                           <div style="overflow-y: visible; padding-top: 8px; padding-right: 4px; ">
+
+                              <label for="date-field-normal" style="margin: 4px;" class="label">Customer
+                                 Note:</label>
+
+                              <textarea class="textarea" style="width: 100%; height:170px; font-family: fangsong;"
+                                 name="description-max" [readonly]="true" [(ngModel)]="CUSText">
 
                                                           </textarea>
 
-                           <label for="date-field-normal" style="margin: 4px;" class="label">Add a new
-                              note:</label>
-                           <div>
-                              <textarea class="textarea" style="width: 60%; height:100px " name="description-max"
-                                 [(ngModel)]="CUSTextNew" cols="55">
+                              <label for="date-field-normal" style="margin: 4px;" class="label">Add a new
+                                 note:</label>
+                              <div>
+                                 <textarea class="textarea" style="width: 60%; height:100px;font-family: fangsong; "
+                                    name="description-max" [(ngModel)]="CUSTextNew" cols="55">
 
                                                                             </textarea>
 
 
-                              <button class="reprintInvoicebtn" type="button" id="primary-action-two"
-                                 (click)="SaveCustomerText()" style="float: right; position: inherit;">Save
-                                 New Note</button>
+                                 <button class="reprintInvoicebtn" type="button" id="primary-action-two"
+                                    (click)="SaveCustomerText()" style="float: right; position: inherit;">Save
+                                    New Note</button>
+                              </div>
+
+
+
+
                            </div>
-
-
-
-
                         </div>
 
                      </ng-template>
@@ -442,9 +448,14 @@
       <kendo-splitter-pane>
          <button class="reprintInvoicebtn" style="z-index: 999;" (click)="reprintInvoice()">Reprint
             Invoice</button>
+
          <kendo-tabstrip #tabstripInvoice (tabSelect)="onTabSelectAginSection($event)">
             <kendo-tabstrip-tab [title]="'Aging'" [selected]="setOpenTabTo">
                <ng-template kendoTabContent>
+                  <div *ngIf="!IsAgingDataLoaded" style="z-index: 999; position: absolute; height: 100%; width: 100%; background-color: gray; opacity: 0.4; font-size: xxx-large;
+                     text-align: center; color: white; padding-top: 3%">
+                     Data loading, Please Wait...!
+                  </div>
                   <div style="height: auto;">
 
 
@@ -471,7 +482,7 @@
                                  </div>
                                  <div style="margin-left: 10px; width: 60px;">
                                     <button class="reprintInvoicebtn" type="button" style="height: 24px; width:90px ;
-                                    margin-top: 14px;" (click)="LoadForcastData()">Load</button>
+                                    margin-top: 14px;" (click)="LoadForcastData()" *ngIf="false">Load</button>
 
                                  </div>
                               </div>
