@@ -89,6 +89,7 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
    CUSText: string = "";
    CUSTextNew;
    selectedCustomerID: string = "";
+   selectedPayerID: string = "";
    selectedOrderID: string = "";
    public value: Date = new Date(2019, 5, 1, 22);
    public format: string = 'MM/dd/yyyy';
@@ -514,8 +515,16 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
          this.setBusy(false);
          if (!response.hasError()) {
 
-            this.CUSCreatedDate = response.items[0].OKRGDT;
-
+            var createDate = response.items[0].OKRGDT;
+            // this.CUSCreatedDate = new Date(this.datepipe.transform(, 'dd-MM-yyyy'));
+            console.log(createDate);
+            var year = createDate.substring(0, 4);
+            console.log(year);
+            var month = createDate.substring(4, 6);
+            console.log(month);
+            var date = createDate.substring(6);
+            console.log(date);
+            this.CUSCreatedDate = date + "/" + month + "/" + year;
          }
       }, (error) => {
          this.setBusy(false);
@@ -960,19 +969,7 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
             this.CUSAccountContact = this.CustomerData.YREF + ' - ' + this.CustomerData.PHNO;
             this.CUSAccountPhone = this.CustomerData.PHNO;
             this.CUSGroup = this.CustomerData.CUCL;
-            var _CUSCreditLimit = this.CustomerData.CRLM;  // Logic to be implement
-            this.CUSCreditLimit = _CUSCreditLimit;// "0";// _CUSCreditLimit.substring(0, 1);
-            switch (this.CUSCreditLimit) {
-               case "0":
-                  this.CUSCreditLimit += "-Not Blocked";
-                  break;
-               case "1":
-                  this.CUSCreditLimit += "-Block CO";
-                  break;
-               case "3":
-                  this.CUSCreditLimit += "-Block CO,EQM";
-                  break;
-            }
+
             this.CUSCRDLimit2 = this.CustomerData.CRL2;
             this.CUSCRDLimit3 = this.CustomerData.CRL3;
             this.UCUS_CRL2 = this.CUSCRDLimit2;
@@ -1022,7 +1019,46 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
          this.logError('Unable to execute API ' + error);
       });
 
+      this.GetCustomerFinancialData(_CUNO);
    }
+
+
+   GetCustomerFinancialData(_CUNO) {
+
+      const request: IMIRequest = {
+         program: 'CRS610MI',
+         transaction: 'GetFinancial',
+         outputFields: ['BLCD'],
+         maxReturnedRecords: 10,
+      };
+
+      // represent input records
+      const inputRecord: MIRecord = new MIRecord();
+      inputRecord.setString('CUNO', _CUNO);
+      request.record = inputRecord;
+
+      this.miService.execute(request).subscribe((response: IMIResponse) => {
+
+         if (!response.hasError()) {
+
+            this.CUSCreditLimit = response.item.BLCD;  // Logic to be implement
+
+            switch (this.CUSCreditLimit) {
+               case "0":
+                  this.CUSCreditLimit += "-Not Blocked";
+                  break;
+               case "1":
+                  this.CUSCreditLimit += "-Block CO";
+                  break;
+               case "3":
+                  this.CUSCreditLimit += "-Block CO,EQM";
+                  break;
+            }
+         }
+      });
+
+   }
+
 
    onCFC5Change(cfc5) {
       this.UCUS_CFC5 = cfc5;
@@ -1205,9 +1241,15 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
       //when button save is pressed it will get the textbox from the bottom richtextbox, split it into 60 chars per line,Add each line to the MI
       this.setBusyCustomerText(true);
 
-      this.CUSTextNew = this.CUSTextNew + "\n";
+      this.CUSTextNew = "\n" + this.CUSTextNew;
+      console.log("Save Customer Text!");
+
+      console.log(this.CUSTextNew);
+      console.log(this.userContext)
       this.arService.SplitToLines(this.CUSTextNew, this.CurrentCustomerTXID, this.CurrentCustomerTXVR, this.CurrentCustomerLNCD, this.userContext.USID).subscribe((res) => {
 
+         console.log("Responce from service:");
+         console.log(res);
          this.setBusyCustomerText(false);
          delete this.CUSTextNew;
          this.GetCustomerText(this.selectedCustomerID);
@@ -1582,29 +1624,29 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
       var AgeDist;
       var _month = new Date().getMonth() + 1;
 
-      this.AGMonth1 = this.getMonthText(_month - 1);
-      this.AGMonth2 = this.getMonthText(_month - 2);
-      this.AGMonth3 = this.getMonthText(_month - 3);
+      this.AGMonth1 = this.getMonthText(_month - 2);
+      this.AGMonth2 = this.getMonthText(_month - 3);
+      this.AGMonth3 = this.getMonthText(_month - 5);
 
       this.y = new Date().getFullYear().toString();
       switch (_month) {
          case 1:
             AgeDist = "13";
+            this.AGMonth1 = this.getMonthText(11);
+            this.AGMonth2 = this.getMonthText(10);
+            this.AGMonth3 = this.getMonthText(9);
+            break;
+         case 2:
+            AgeDist = "15";
             this.AGMonth1 = this.getMonthText(12);
             this.AGMonth2 = this.getMonthText(11);
             this.AGMonth3 = this.getMonthText(10);
             break;
-         case 2:
-            AgeDist = "15";
+         case 3:
+            AgeDist = "17";
             this.AGMonth1 = this.getMonthText(1);
             this.AGMonth2 = this.getMonthText(12);
             this.AGMonth3 = this.getMonthText(11);
-            break;
-         case 3:
-            AgeDist = "17";
-            this.AGMonth1 = this.getMonthText(2);
-            this.AGMonth2 = this.getMonthText(1);
-            this.AGMonth3 = this.getMonthText(12);
             break;
          case 4:
             AgeDist = "19";
@@ -1649,9 +1691,9 @@ export class ArdashboardComponent extends CoreBase implements OnInit {
    public GetPmtForcast(): string {
       var PmtForcast = "";
       var _month = new Date().getMonth() + 1;
-      this.PFMonth1 = this.getMonthText(_month);
-      this.PFMonth2 = this.getMonthText(_month + 1);
-      this.PFMonth3 = this.getMonthText(_month + 2);
+      this.PFMonth1 = this.getMonthText(_month - 1);
+      this.PFMonth2 = this.getMonthText(_month);
+      this.PFMonth3 = this.getMonthText(_month + 1);
       switch (_month) {
          case 1:
             PmtForcast = "11";

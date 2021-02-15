@@ -132,10 +132,24 @@
                                        <label for="first-name" class="inputfield">Acc Contact & Phone</label>
                                        <input type="text" [(ngModel)]="CUSAccountContact" name="first-name"
                                           [readonly]="true" />
+
+
                                     </div>
-                                    <div class="field" style="width: 100px; ">
-                                       <label for="first-name" class="inputfield">Sales Person</label>
-                                       <input type="text" [(ngModel)]="CUSSales" name="first-name" [readonly]="true" />
+                                    <div class="field" style="width: 100%; ">
+
+                                       <div class="one-half column" style="margin-left: 0px;">
+                                          <label for="first-name" class="inputfield">Account Created</label>
+                                          <input type="text" [(ngModel)]="CUSCreatedDate" name="first-name"
+                                             [readonly]="true" />
+                                       </div>
+
+                                       <div class="one-half column" style="margin-left: 5px;">
+                                          <label for="first-name" class="inputfield">Sales Person</label>
+                                          <input type="text" [(ngModel)]="CUSSales" name="first-name"
+                                             [readonly]="true" />
+                                       </div>
+
+
 
                                     </div>
                                     <div class="field">
@@ -143,7 +157,7 @@
                                           Stop</label>
                                        <input type="text" [(ngModel)]="CUSCreditLimit" name="first-name"
                                           [readonly]="true"
-                                          style="width: 60px; margin-right: 4px; margin-bottom: 5px;" />
+                                          style="width: 120px; margin-right: 4px; margin-bottom: 5px;" />
                                        <input type="text" [(ngModel)]="CUSPersonalGuar" name="first-name"
                                           [readonly]="true" style="width: 30px; margin-right: 4px;" />
                                        <input type="text" [(ngModel)]="CUSPersonalGuarText" name="first-name"
@@ -468,7 +482,7 @@
                         <div style="width: 200px; height: 100px; margin-left: 20px;">
                            <div class="field">
                               <label for="first-name" class="inputfield">Payer:</label>
-                              <input type="text" [(ngModel)]="selectedCustomerID" [readonly]="true" />
+                              <input type="text" [(ngModel)]="CUSPayer" [readonly]="true" />
                            </div>
                            <div class="field">
                               <div class="row container" style="margin-bottom: 0px;">
@@ -589,11 +603,11 @@
                               </div>
                               <div class="one-fifth column">
 
-                                 <label for="first-name" class="inputfield cus-subTitle1">cumulative YTD</label>
+                                 <label for="first-name" class="inputfield cus-subTitle1">Cumulative YTD</label>
 
                               </div>
                               <div class="one-fifth column">
-                                 <label for="first-name" class="inputfield cus-subTitle1">cumulative YTD</label>
+                                 <label for="first-name" class="inputfield cus-subTitle1">Previous YTD</label>
                               </div>
                               <div class="one-fifth column" style="width: 6%;">
                                  <label for="first-name" class="inputfield">&nbsp;</label>
@@ -971,10 +985,3 @@
 
 
 </div>
-
-
-
-
-
-<!--*************
-   ***********************-->
